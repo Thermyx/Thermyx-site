@@ -1,0 +1,175 @@
+/* Part cards and leader lines, over the 3D stage. Positioned by the in-canvas tracker. */
+.callouts {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.callouts__lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.callouts__lines line {
+  stroke: var(--accent);
+  stroke-width: 1.25;
+  stroke-opacity: 0.85;
+}
+
+.callouts__dot {
+  fill: var(--accent);
+}
+
+.callouts__halo {
+  fill: var(--accent);
+  fill-opacity: 0.18;
+  stroke: var(--accent);
+  stroke-opacity: 0.55;
+  stroke-width: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: halo-pulse 2.4s var(--ease-out) infinite;
+}
+
+.callouts__end {
+  fill: var(--bg);
+  stroke: var(--accent);
+  stroke-width: 1.25;
+}
+
+@keyframes halo-pulse {
+  0% {
+    scale: 0.6;
+    opacity: 1;
+  }
+  70%,
+  100% {
+    scale: 1.35;
+    opacity: 0;
+  }
+}
+
+/* The card: a frosted plate with an accent hairline along the top. */
+.callout {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 280px;
+  padding: 16px 18px 18px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 14px;
+  background: rgb(10 11 14 / 0.8);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  box-shadow:
+    0 20px 50px rgb(0 0 0 / 0.45),
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
+  user-select: none;
+  touch-action: none;
+  animation: callout-in 220ms var(--ease-out) both;
+}
+
+.callout::before {
+  content: "";
+  position: absolute;
+  inset: -1px 18px auto;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+/* Previews follow the hover and ignore the pointer; pinned cards can be picked up. */
+.callout:not([data-pinned]) {
+  pointer-events: none;
+}
+
+.callout[data-pinned] {
+  pointer-events: auto;
+  cursor: grab;
+}
+
+.callout[data-dragging] {
+  cursor: grabbing;
+  box-shadow:
+    0 28px 64px rgb(0 0 0 / 0.55),
+    inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+/* Pinned: a filled accent pip in the corner; previews show it hollow. */
+.callout::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid var(--accent);
+  border-radius: 50%;
+}
+
+.callout[data-pinned]::after {
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+@keyframes callout-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
+.callout__product {
+  margin: 0 0 6px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-stretch: var(--label-stretch);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.callout__title {
+  margin: 0;
+  padding-right: 18px;
+  font-size: 1.0625rem;
+  font-weight: 650;
+  font-stretch: 106%;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.callout__role {
+  margin: 8px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.callout__part {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text);
+}
+
+@media (max-width: 640px) {
+  .callout {
+    width: 228px;
+    padding: 12px 14px 14px;
+  }
+
+  .callout__title {
+    font-size: 0.9375rem;
+  }
+
+  .callout__role {
+    font-size: 0.8125rem;
+  }
+}

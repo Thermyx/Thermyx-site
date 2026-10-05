@@ -1,0 +1,12 @@
+/* Fixed behind every page. Page content sits above it (z-index 1); where nothing covers it (the
+   home stage is pointer-transparent), the canvas takes the pointer for picking and orbiting. */
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--bg);
+}
+
+.scene canvas {
+  display: block;
+}

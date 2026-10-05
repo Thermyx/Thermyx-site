@@ -1,0 +1,70 @@
+/* Buttons: a crisp pill. Primary is signal blue with dark ink (6.4:1); ghost is a hairline. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 0.9375rem;
+  font-weight: 620;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color var(--dur-micro) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-out),
+    box-shadow var(--dur-micro) var(--ease-out),
+    translate var(--dur-micro) var(--ease-out);
+}
+
+.button--primary {
+  background: var(--signal);
+  color: var(--on-signal);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    0 10px 28px -6px rgb(44 156 240 / 0.55);
+}
+
+.button--ghost {
+  border: 1px solid var(--hairline-strong);
+  background: rgb(13 26 43 / 0.45);
+  color: var(--text);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.button--small {
+  min-height: 40px;
+  padding: 0 18px;
+  font-size: 0.875rem;
+}
+
+@media (hover: hover) {
+  .button--primary:hover {
+    background: #48acf4;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.32),
+      0 14px 36px -6px rgb(44 156 240 / 0.7);
+    translate: 0 -1px;
+  }
+
+  .button--ghost:hover {
+    border-color: rgb(91 210 255 / 0.55);
+    background: rgb(13 26 43 / 0.7);
+  }
+}
+
+.button:active {
+  translate: 0 1px;
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: progress;
+  translate: none;
+}

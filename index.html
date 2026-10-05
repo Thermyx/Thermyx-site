@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Thermyx: a pair of smart insoles that sense temperature, pressure, and movement, then heat or cool each foot within hard safety limits." />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- Start the model download in parallel with the JS bundle. -->
+    <link rel="preload" href="/model_whole.glb" as="fetch" type="model/gltf-binary" crossorigin />
+    <title>Thermyx · Climate control for your feet</title>
+    <style>
+      html { background: #000; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

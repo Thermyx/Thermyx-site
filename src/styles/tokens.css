@@ -1,0 +1,45 @@
+/* Design tokens. Black site; accents are the Thermyx app's own (ThermyxApp/DesignSystem).
+   Contrast on black / surface / raised (WCAG): text 19.0 / 17.7 / 16.6, muted 9.7 / 9.0 / 8.4,
+   faint 6.0 / 5.6 / 5.2, ice 12.1, signal 7.1, ember 7.3, amber 10.0. */
+:root {
+  /* ── Surfaces ── */
+  --bg: #000;
+  --surface: #0b0c0f;
+  --raised: #131519;
+  --glass: rgb(14 16 20 / 0.55);
+  --hairline: rgb(255 255 255 / 0.08);
+  --hairline-strong: rgb(255 255 255 / 0.14);
+
+  /* ── Text ── */
+  --text: #f1f4f8;
+  --text-muted: #a4b1c2;
+  --text-faint: #7f8a99;
+
+  /* ── Accents ── */
+  --signal: #2c9cf0; /* primary action */
+  --ice: #5bd2ff; /* cooling, foot-side parts */
+  --ember: #ff6a13; /* heating, heat-path parts */
+  --amber: #ff9b3d;
+  --on-signal: #03121f;
+
+  /* Foot side to hot side: the product's heat path. */
+  --thermal: linear-gradient(90deg in oklch, var(--ice), var(--ember));
+
+  /* ── Type ── Archivo (variable: width 62 to 125%, weight 100 to 900), the app typeface. */
+  --font: "Archivo Variable", "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, monospace;
+  --display-stretch: 112%;
+  --label-stretch: 75%;
+
+  /* ── Motion ── */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --dur-micro: 180ms;
+  --dur-exit: 140ms;
+
+  /* ── Layout ── */
+  --gutter: clamp(18px, 3.5vw, 48px);
+  --content: 1240px;
+  --header-height: 76px;
+  --radius: 18px;
+}

@@ -7,6 +7,10 @@
   background: var(--bg);
 }
 
+.scene[data-hidden] {
+  visibility: hidden;
+}
+
 .scene canvas {
   display: block;
 }

@@ -1,6 +1,7 @@
-// The site's pages, in header order. Each is a placeholder until its content arrives.
+// The site's pages, in header order. `theme` picks the page's palette: "dark" (the default, over
+// the 3D Topography canvas) or "cream" (the app page: its own light world).
 export const PAGES = [
-  { path: "/app", label: "App" },
+  { path: "/app", label: "App", theme: "cream" },
   { path: "/team", label: "Team" },
   { path: "/validation", label: "Validation" },
   { path: "/news", label: "News" },

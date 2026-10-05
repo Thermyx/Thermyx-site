@@ -37,9 +37,60 @@
   --dur-micro: 180ms;
   --dur-exit: 140ms;
 
+  /* ── Chrome (header, menu, footer, quiet buttons) ── */
+  --header-bg: rgb(10 11 14 / 0.42);
+  --header-bg-scrolled: rgb(10 11 14 / 0.62);
+  --header-sheen: rgb(255 255 255 / 0.055);
+  --header-border: rgb(255 255 255 / 0.09);
+  --header-shadow: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 12px 40px -12px rgb(0 0 0 / 0.6);
+  --hover-fill: rgb(255 255 255 / 0.07);
+  --menu-bg: rgb(0 0 0 / 0.86);
+  --cta-quiet-bg: rgb(8 10 14 / 0.9);
+  --ghost-bg: rgb(13 26 43 / 0.45);
+  --ghost-bg-hover: rgb(13 26 43 / 0.7);
+  --footer-bg: linear-gradient(180deg, rgb(0 0 0 / 0.55), #000 60%);
+  --wordmark-fill: linear-gradient(180deg, rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.02));
+
   /* ── Layout ── */
   --gutter: clamp(18px, 3.5vw, 48px);
   --content: 1240px;
   --header-height: 76px;
   --radius: 18px;
+}
+
+/* The cream theme (the app page): the icon's paper cream and its navy, with the same signal blue and
+   ember. The light accents are too pale for text on cream, so text accents use the *-ink tokens.
+   Contrast on --bg: text 14.4, muted 7.4, faint 4.9, navy 11.2, ice-ink 4.8, ember-ink 4.6; the
+   display gradient's ends (large text only) 3.2 and 3.1. */
+:root[data-theme="cream"] {
+  --bg: #eee9e0;
+  --surface: #f6f2ea;
+  --raised: #fbf9f4;
+  --glass: rgb(255 252 246 / 0.6);
+  --hairline: rgb(10 46 88 / 0.12);
+  --hairline-strong: rgb(10 46 88 / 0.2);
+
+  --text: #0b1a30;
+  --text-muted: #3d4a5f;
+  --text-faint: #5c6576;
+  --navy: #0a2e58;
+  --ice-ink: #0f6aa8;
+  --ember-ink: #b2470a;
+  --display-blue: #1f86d6;
+  --display-orange: #e2570c;
+  --on-navy: #f6f1e7;
+
+  --header-bg: rgb(251 248 241 / 0.55);
+  --header-bg-scrolled: rgb(251 248 241 / 0.78);
+  --header-sheen: rgb(255 255 255 / 0.5);
+  --header-border: rgb(10 46 88 / 0.1);
+  --header-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), 0 14px 34px -18px rgb(10 46 88 / 0.35);
+  --hover-fill: rgb(10 46 88 / 0.07);
+  --menu-bg: rgb(238 233 224 / 0.92);
+  --cta-quiet-bg: var(--navy);
+  --cta-quiet-ink: var(--on-navy);
+  --ghost-bg: rgb(255 252 246 / 0.55);
+  --ghost-bg-hover: rgb(255 252 246 / 0.9);
+  --footer-bg: linear-gradient(180deg, rgb(238 233 224 / 0.6), var(--bg) 55%);
+  --wordmark-fill: linear-gradient(180deg, rgb(10 46 88 / 0.14), rgb(10 46 88 / 0.03));
 }

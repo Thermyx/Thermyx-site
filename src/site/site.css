@@ -44,6 +44,11 @@
   mix-blend-mode: screen;
 }
 
+/* On cream, light can't be added on top: the trail is drawn as color instead. */
+[data-theme="cream"] .glow-cursor.site-glow {
+  mix-blend-mode: normal;
+}
+
 /* Some React Bits components carry Tailwind class names; this site doesn't use Tailwind. */
 .inline-block {
   display: inline-block;
@@ -109,7 +114,7 @@
   /* Bottom padding clears the page's bottom blur at the very end of the page. */
   padding: 72px var(--gutter) 96px;
   border-top: 1px solid var(--hairline);
-  background: linear-gradient(180deg, rgb(0 0 0 / 0.55), #000 60%);
+  background: var(--footer-bg);
 }
 
 .site-footer__inner {
@@ -166,7 +171,7 @@
   line-height: 0.8;
   letter-spacing: -0.05em;
   text-align: center;
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.02));
+  background: var(--wordmark-fill);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

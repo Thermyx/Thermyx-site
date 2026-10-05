@@ -18,27 +18,25 @@
   height: calc(var(--header-height) - 20px);
   margin: 0 auto;
   padding: 0 10px 0 22px;
-  border: 1px solid rgb(255 255 255 / 0.09);
+  border: 1px solid var(--header-border);
   border-radius: 16px;
   background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.055), rgb(255 255 255 / 0.01)),
-    rgb(10 11 14 / 0.42);
+    linear-gradient(180deg, var(--header-sheen), transparent),
+    var(--header-bg);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
   backdrop-filter: blur(18px) saturate(160%);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.07),
-    0 12px 40px -12px rgb(0 0 0 / 0.6);
+  box-shadow: var(--header-shadow);
   pointer-events: auto;
   transition:
-    background-color 240ms var(--ease-out),
+    background 240ms var(--ease-out),
     border-color 240ms var(--ease-out);
 }
 
 .site-header[data-scrolled] .site-header__bar {
-  border-color: rgb(255 255 255 / 0.12);
+  border-color: var(--hairline-strong);
   background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.015)),
-    rgb(10 11 14 / 0.62);
+    linear-gradient(180deg, var(--header-sheen), transparent),
+    var(--header-bg-scrolled);
 }
 
 .site-header__brand {
@@ -52,6 +50,16 @@
 .site-header__brand img {
   width: auto;
   height: 30px;
+}
+
+/* One wordmark per palette: light ink on dark pages, the original navy on cream. */
+.site-header__logo--navy,
+[data-theme="cream"] .site-header__logo--light {
+  display: none;
+}
+
+[data-theme="cream"] .site-header__logo--navy {
+  display: block;
 }
 
 /* ── Pages ── */
@@ -89,7 +97,7 @@
   position: absolute;
   inset: 0;
   border-radius: 10px;
-  background: rgb(255 255 255 / 0.07);
+  background: var(--hover-fill);
 }
 
 .site-nav__active {
@@ -142,7 +150,7 @@
   height: 44px;
   border: 1px solid var(--hairline-strong);
   border-radius: 12px;
-  background: rgb(255 255 255 / 0.04);
+  background: var(--hover-fill);
   cursor: pointer;
 }
 
@@ -157,7 +165,7 @@
   gap: 32px;
   padding: calc(var(--header-height) + 40px) var(--gutter) max(32px, env(safe-area-inset-bottom));
   overflow-y: auto;
-  background: rgb(0 0 0 / 0.86);
+  background: var(--menu-bg);
   -webkit-backdrop-filter: blur(24px) saturate(140%);
   backdrop-filter: blur(24px) saturate(140%);
   pointer-events: auto;
@@ -191,7 +199,7 @@
 .site-menu__index {
   font-size: 0.75rem;
   letter-spacing: 0;
-  color: var(--ice);
+  color: var(--ice-ink, var(--ice));
 }
 
 .site-menu__cta {

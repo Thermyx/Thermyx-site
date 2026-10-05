@@ -7,7 +7,7 @@ import { PropertyBinding } from "three";
 import { COMPONENTS, findComponent } from "../src/data/components.js";
 import { findExplodeOffsetMm } from "../src/data/explode.js";
 
-const FILE = "public/model_whole.glb";
+const FILE = "public/hardware-model.glb";
 const EXPECTED_BODIES = 20;
 const EXPECTED_GLASS = 3;
 

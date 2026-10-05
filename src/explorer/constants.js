@@ -1,7 +1,7 @@
 import { ACESFilmicToneMapping, Color, SRGBColorSpace } from "three";
 
 // Exported from Fusion by ExportGLB.py; validate with `npm run check:model`.
-export const MODEL_URL = "/model_whole.glb";
+export const MODEL_URL = "/hardware-model.glb";
 
 // Scene background (--bg, black). Transmission samples the scene background, so it must be
 // opaque (§3.3); the Topography lines are drawn over it inside the scene, so the glass refracts them.

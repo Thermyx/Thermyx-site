@@ -1,5 +1,7 @@
 import { MotionConfig } from "motion/react";
+import { useLayoutEffect } from "react";
 import { Route, Routes } from "react-router-dom";
+import AppPage from "./app/AppPage.jsx";
 import GradualBlur from "./components/GradualBlur.jsx";
 import SceneCanvas from "./explorer/SceneCanvas.jsx";
 import Home from "./home/Home.jsx";
@@ -10,11 +12,22 @@ import Header from "./site/Header.jsx";
 import { PAGES } from "./site/pages.js";
 import ScrollManager from "./site/ScrollManager.jsx";
 import SiteGlow from "./site/SiteGlow.jsx";
+import { THEMES, usePageTheme } from "./site/theme.js";
 import "./site/site.css";
+
+// Pages with content of their own; the rest are placeholders until theirs arrives.
+const PAGE_ELEMENTS = { "/app": <AppPage /> };
 
 // Every page shares the fixed 3D canvas (the Topography backdrop, and the model on home), the glass
 // header, the footer, the cursor glow, and the soft blur at the top and bottom of the window.
+// Each page's palette (src/site/pages.js) is applied to <html> before it paints.
 export default function App() {
+  const theme = usePageTheme();
+  useLayoutEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEMES[theme].chrome);
+  }, [theme]);
+
   return (
     // reducedMotion="user": Motion drops transform animations for people who ask for less motion.
     <MotionConfig reducedMotion="user">
@@ -28,7 +41,7 @@ export default function App() {
         <Routes>
           <Route index element={<Home />} />
           {PAGES.map(({ path, label }) => (
-            <Route key={path} path={path} element={<PlaceholderPage title={label} />} />
+            <Route key={path} path={path} element={PAGE_ELEMENTS[path] ?? <PlaceholderPage title={label} />} />
           ))}
           <Route path="*" element={<NotFound />} />
         </Routes>

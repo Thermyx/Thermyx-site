@@ -9,11 +9,16 @@
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <!-- Start the model download in parallel with the JS bundle. -->
-    <link rel="preload" href="/model_whole.glb" as="fetch" type="model/gltf-binary" crossorigin />
+    <link rel="preload" href="/hardware-model.glb" as="fetch" type="model/gltf-binary" crossorigin />
     <title>Thermyx · Climate control for your feet</title>
     <style>
       html { background: #000; }
+      html[data-theme="cream"] { background: #eee9e0; }
     </style>
+    <script>
+      // The app page is cream (src/site/pages.js); set it before first paint so it never flashes black.
+      if (/^\/app\/?$/.test(location.pathname)) document.documentElement.dataset.theme = "cream";
+    </script>
   </head>
   <body>
     <div id="root"></div>

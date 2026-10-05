@@ -1,6 +1,7 @@
 import { Canvas, useThree } from "@react-three/fiber";
 import { Suspense, useEffect } from "react";
 import { useReducedMotion } from "../lib/useReducedMotion.js";
+import { usePageTheme } from "../site/theme.js";
 import Assembly from "./Assembly.jsx";
 import CameraRig from "./CameraRig.jsx";
 import { useCallouts } from "./callouts.js";
@@ -19,18 +20,20 @@ const onCanvasError = () => useModel.setState({ status: "unsupported" });
 // home page the 3D model (CameraRig hides it elsewhere). One canvas because the glass needs the
 // backdrop inside its scene to refract it (see TopographyBackdrop), and one context is cheaper
 // than two. The model streams in behind its own boundary, so a failed load leaves the backdrop up.
+// Cream pages have their own backdrop: there the canvas is hidden and its loop stopped.
 export default function SceneCanvas() {
   const attempt = useModel((s) => s.attempt);
   const reducedMotion = useReducedMotion();
+  const hidden = usePageTheme() !== "dark";
 
   return (
-    <div className="scene" aria-hidden="true">
+    <div className="scene" aria-hidden="true" data-hidden={hidden || undefined}>
       <ErrorBoundary onError={onCanvasError}>
         <Canvas
           gl={GL}
           dpr={DPR}
           camera={CAMERA}
-          frameloop={reducedMotion ? "demand" : "always"}
+          frameloop={hidden ? "never" : reducedMotion ? "demand" : "always"}
           onCreated={exposeForDebugging}
         >
           {/* Opaque background: the glass refracts it (§3.3). */}

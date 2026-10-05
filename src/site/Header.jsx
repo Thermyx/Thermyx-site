@@ -29,7 +29,8 @@ export default function Header() {
     <header className="site-header" data-scrolled={scrolled || open || undefined}>
       <div className="site-header__bar">
         <Link to="/" className="site-header__brand" aria-label="Thermyx home">
-          <img src="/brand/thermyx-logo-light.png" alt="" width="2004" height="567" decoding="async" />
+          <img className="site-header__logo--light" src="/brand/thermyx-logo-light.png" alt="" width="2004" height="567" decoding="async" />
+          <img className="site-header__logo--navy" src="/brand/thermyx-logo.png" alt="" width="2172" height="724" decoding="async" />
         </Link>
 
         <nav className="site-nav" aria-label="Main" onPointerLeave={() => setHovered(null)}>
@@ -59,9 +60,9 @@ export default function Header() {
             className="site-header__cta"
             color="#5bd2ff"
             speed="5s"
-            backgroundColor="rgb(8 10 14 / 0.9)"
-            borderColor="rgb(255 255 255 / 0.14)"
-            textColor="var(--text)"
+            backgroundColor="var(--cta-quiet-bg)"
+            borderColor="var(--hairline-strong)"
+            textColor="var(--cta-quiet-ink, var(--text))"
           >
             Join waitlist
           </StarBorder>

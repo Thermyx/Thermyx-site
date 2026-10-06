@@ -1,22 +1,32 @@
 import { MotionConfig } from "motion/react";
 import { useLayoutEffect } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import AppPage from "./app/AppPage.jsx";
 import GradualBlur from "./components/GradualBlur.jsx";
 import SceneCanvas from "./explorer/SceneCanvas.jsx";
 import Home from "./home/Home.jsx";
+import ContactPage from "./pages/contact/ContactPage.jsx";
+import MediaPage from "./pages/media/MediaPage.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import PlaceholderPage from "./pages/PlaceholderPage.jsx";
+import TeamPage from "./pages/team/TeamPage.jsx";
 import Footer from "./site/Footer.jsx";
 import Header from "./site/Header.jsx";
-import { PAGES } from "./site/pages.js";
+import { PAGES, REDIRECTS } from "./site/pages.js";
 import ScrollManager from "./site/ScrollManager.jsx";
 import SiteGlow from "./site/SiteGlow.jsx";
 import { THEMES, usePageTheme } from "./site/theme.js";
 import "./site/site.css";
 
-// Pages with content of their own; the rest are placeholders until theirs arrives.
-const PAGE_ELEMENTS = { "/app": <AppPage /> };
+// Pages with content of their own; the rest are placeholders until theirs arrives. (A masonry
+// Validation page is built in src/pages/validation/ but not routed yet: add
+// "/validation": <ValidationPage /> here to bring it back.)
+const PAGE_ELEMENTS = {
+  "/app": <AppPage />,
+  "/team": <TeamPage />,
+  "/media": <MediaPage />,
+  "/contact": <ContactPage />,
+};
 
 // Every page shares the fixed 3D canvas (the Topography backdrop, and the model on home), the glass
 // header, the footer, the cursor glow, and the soft blur at the top and bottom of the window.
@@ -42,6 +52,9 @@ export default function App() {
           <Route index element={<Home />} />
           {PAGES.map(({ path, label }) => (
             <Route key={path} path={path} element={PAGE_ELEMENTS[path] ?? <PlaceholderPage title={label} />} />
+          ))}
+          {REDIRECTS.map(({ from, to }) => (
+            <Route key={from} path={from} element={<Navigate to={to} replace />} />
           ))}
           <Route path="*" element={<NotFound />} />
         </Routes>

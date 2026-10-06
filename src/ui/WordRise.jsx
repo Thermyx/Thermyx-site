@@ -16,7 +16,7 @@ export default function WordRise({ text, as = "span", className, delay = 0, stag
 
   return (
     <Tag className={className} {...trigger} transition={{ staggerChildren: stagger, delayChildren: delay }}>
-      <span className="visually-hidden">{text}</span>
+      <span className="visually-hidden word-rise__sr">{text}</span>
       {words.map((word, i) => (
         // The space sits between the masks: inside one, an inline-block would swallow it.
         <Fragment key={i}>

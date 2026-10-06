@@ -1,0 +1,234 @@
+/* Social chips: quiet at rest, neon in the platform's own color on hover or focus. */
+.social-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 16px 9px 9px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 16px;
+  background: rgb(255 255 255 / 0.03);
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    border-color 280ms var(--ease-out),
+    background-color 280ms var(--ease-out),
+    box-shadow 280ms var(--ease-out),
+    translate 280ms var(--ease-out);
+}
+
+.social-chip__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.06);
+  color: var(--text-muted);
+  font-size: 1.15rem;
+  transition:
+    background 280ms var(--ease-out),
+    color 280ms var(--ease-out),
+    box-shadow 280ms var(--ease-out);
+}
+
+.social-chip__text {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+}
+
+.social-chip__name {
+  font-size: 0.9375rem;
+  font-weight: 650;
+  line-height: 1.2;
+  transition: text-shadow 280ms var(--ease-out);
+}
+
+.social-chip__handle {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.2;
+  color: var(--text-faint);
+  transition: color 280ms var(--ease-out);
+}
+
+.social-chip__arrow {
+  color: var(--text-faint);
+  opacity: 0;
+  translate: -4px 4px;
+  transition:
+    opacity 280ms var(--ease-out),
+    translate 280ms var(--ease-out),
+    color 280ms var(--ease-out);
+}
+
+.social-chip:hover,
+.social-chip:focus-visible {
+  border-color: var(--brand);
+  background: color-mix(in oklch, var(--brand) 9%, transparent);
+  box-shadow:
+    0 0 0 1px var(--brand),
+    0 0 18px color-mix(in oklch, var(--brand) 55%, transparent),
+    0 0 52px color-mix(in oklch, var(--brand-2) 32%, transparent),
+    inset 0 0 20px color-mix(in oklch, var(--brand) 22%, transparent);
+  translate: 0 -2px;
+}
+
+.social-chip:hover .social-chip__icon,
+.social-chip:focus-visible .social-chip__icon {
+  background: var(--brand-fill);
+  color: #fff;
+  box-shadow: 0 0 22px color-mix(in oklch, var(--brand) 75%, transparent);
+}
+
+.social-chip:hover .social-chip__name,
+.social-chip:focus-visible .social-chip__name {
+  text-shadow:
+    0 0 10px color-mix(in oklch, var(--brand) 80%, transparent),
+    0 0 24px color-mix(in oklch, var(--brand-2) 50%, transparent);
+}
+
+.social-chip:hover .social-chip__handle,
+.social-chip:focus-visible .social-chip__handle,
+.social-chip:hover .social-chip__arrow {
+  color: var(--brand);
+}
+
+.social-chip:hover .social-chip__arrow,
+.social-chip:focus-visible .social-chip__arrow {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* TikTok: its black tile and the cyan/pink split. */
+.social-chip[data-social="tiktok"]:hover .social-chip__icon,
+.social-chip[data-social="tiktok"]:focus-visible .social-chip__icon {
+  background: #000;
+  filter: drop-shadow(-2px -1px 0 #25f4ee) drop-shadow(2px 1px 0 #fe2c55);
+}
+
+/* Larger, for the Contact page grid. */
+.social-chip[data-size="lg"] {
+  gap: 16px;
+  width: 100%;
+  padding: 16px 20px 16px 16px;
+  border-radius: 20px;
+}
+
+.social-chip[data-size="lg"] .social-chip__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  font-size: 1.4rem;
+}
+
+.social-chip[data-size="lg"] .social-chip__name {
+  font-size: 1.125rem;
+}
+
+.social-chip[data-size="lg"] .social-chip__handle {
+  font-size: 0.8125rem;
+}
+
+.social-chip[data-size="lg"] .social-chip__arrow {
+  margin-left: auto;
+}
+
+/* On cream there's no dark to glow against: the light becomes color and a softer halo, and
+   handles darken to stay readable. */
+[data-theme="cream"] .social-chip {
+  background: rgb(255 255 255 / 0.5);
+}
+
+[data-theme="cream"] .social-chip__icon {
+  background: rgb(10 46 88 / 0.06);
+}
+
+[data-theme="cream"] .social-chip:hover,
+[data-theme="cream"] .social-chip:focus-visible {
+  background: color-mix(in oklch, var(--brand) 8%, white);
+  box-shadow:
+    0 0 0 1px var(--brand),
+    0 10px 30px -10px color-mix(in oklch, var(--brand) 60%, transparent);
+}
+
+[data-theme="cream"] .social-chip:hover .social-chip__name {
+  text-shadow: none;
+}
+
+[data-theme="cream"] .social-chip:hover .social-chip__handle,
+[data-theme="cream"] .social-chip:hover .social-chip__arrow {
+  color: color-mix(in oklch, var(--brand) 62%, black);
+}
+
+/* The loop's cards: bigger, and wearing their platform's color at rest. */
+.social-chip[data-size="loop"] {
+  gap: 14px;
+  min-width: 270px;
+  padding: 12px 22px 12px 12px;
+  border-color: color-mix(in oklch, var(--brand) 32%, transparent);
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, color-mix(in oklch, var(--brand) 16%, transparent), transparent 62%),
+    rgb(255 255 255 / 0.02);
+}
+
+.social-chip[data-size="loop"] .social-chip__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  background: var(--brand-fill);
+  color: #fff;
+  font-size: 1.4rem;
+  box-shadow: 0 8px 24px -8px color-mix(in oklch, var(--brand) 70%, transparent);
+}
+
+.social-chip[data-size="loop"][data-social="tiktok"] .social-chip__icon {
+  background: #000;
+  filter: drop-shadow(-1.5px -1px 0 #25f4ee) drop-shadow(1.5px 1px 0 #fe2c55);
+}
+
+.social-chip[data-size="loop"] .social-chip__name {
+  font-size: 1.125rem;
+}
+
+.social-chip[data-size="loop"] .social-chip__handle {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.social-chip[data-size="loop"] .social-chip__arrow {
+  margin-left: auto;
+  opacity: 0.5;
+  translate: 0 0;
+}
+
+.social-chip[data-size="loop"]:hover,
+.social-chip[data-size="loop"]:focus-visible {
+  scale: 1.03;
+}
+
+.social-chip[data-size="loop"]:hover .social-chip__icon {
+  box-shadow: 0 0 30px color-mix(in oklch, var(--brand) 90%, transparent);
+}
+
+[data-theme="cream"] .social-chip[data-size="loop"] {
+  background:
+    linear-gradient(135deg, color-mix(in oklch, var(--brand) 14%, white), rgb(255 255 255 / 0.6) 62%);
+}
+
+[data-theme="cream"] .social-chip[data-size="loop"] .social-chip__handle {
+  color: var(--text-muted);
+}
+
+/* The loop: room for the hover glow, lift, and scale; no list markers. */
+.social-loop {
+  padding-block: 18px;
+}
+
+.social-loop .logoloop__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

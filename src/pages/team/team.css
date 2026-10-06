@@ -1,0 +1,511 @@
+/* Team: five crystal cards on a turning star (drawn in the 3D scene behind the page; the page
+   lays a button over each), and a drawn card that opens over the page. */
+.team {
+  /* The ProfileCard's holographic bands, in the brand's blues and oranges (rainbow by default). */
+  --sunpillar-1: hsl(205 100% 70%);
+  --sunpillar-2: hsl(190 100% 72%);
+  --sunpillar-3: hsl(24 100% 64%);
+  --sunpillar-4: hsl(14 100% 62%);
+  --sunpillar-5: hsl(212 92% 66%);
+  --sunpillar-6: hsl(34 100% 64%);
+  --sunpillar-clr-1: var(--sunpillar-1);
+  --sunpillar-clr-2: var(--sunpillar-2);
+  --sunpillar-clr-3: var(--sunpillar-3);
+  --sunpillar-clr-4: var(--sunpillar-4);
+  --sunpillar-clr-5: var(--sunpillar-5);
+  --sunpillar-clr-6: var(--sunpillar-6);
+}
+
+html[data-dialog-open] {
+  overflow: hidden;
+}
+
+/* ── The star ── */
+.team-star {
+  position: relative;
+  padding-top: calc(var(--header-height) + clamp(24px, 3.5vw, 48px));
+  text-align: center;
+}
+
+.team-star__head {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.team-star__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-stretch: var(--label-stretch);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.team-star__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ember);
+  box-shadow: 0 0 12px var(--ember);
+}
+
+.team-star__title {
+  margin: 0;
+  font-size: clamp(2.4rem, 4.8vw, 4.4rem);
+  font-weight: 780;
+  font-stretch: 115%;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+/* The magician's line, and the shuffle beside it. */
+.team-star__cue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 18px;
+  margin-top: 18px;
+}
+
+.team-star__hint {
+  margin: 0;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: clamp(1.25rem, 2vw, 1.6rem);
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.team-star__shuffle {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 999px;
+  background: rgb(8 9 12 / 0.7);
+  font-size: 0.9375rem;
+  font-weight: 650;
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-micro) var(--ease-out),
+    background-color var(--dur-micro) var(--ease-out),
+    opacity var(--dur-micro) var(--ease-out);
+}
+
+.team-star__shuffle:hover {
+  border-color: var(--ice);
+  background: rgb(91 210 255 / 0.12);
+}
+
+.team-star__shuffle[aria-disabled] {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+.team-star__shuffle svg {
+  transition: rotate 400ms var(--ease-out);
+}
+
+.team-star__shuffle:hover svg {
+  rotate: 180deg;
+}
+
+/* A screen and a quarter tall: the star is big, so as it turns its outer cards ride past the top
+   and bottom of the window. On phones the width limits it, and a screen is enough. */
+.team-star__stage {
+  position: relative;
+  height: max(125svh, 760px);
+  overflow: clip; /* on narrow screens the star runs past the edges; the page mustn't scroll sideways */
+}
+
+@media (max-width: 599px) {
+  .team-star__stage {
+    height: max(100svh, 620px);
+  }
+}
+
+.team-star__field {
+  position: absolute;
+  inset: calc(var(--header-height) + 8px) 0 64px; /* clear of the header and the bottom blur */
+}
+
+/* Each card's button sits exactly over its crystal (the scene sets size and transform). */
+.star-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 7%/5%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transform-origin: 50% 50%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.star-card:focus-visible {
+  outline: 2px solid var(--ice);
+  outline-offset: 6px;
+}
+
+/* Without WebGL: plain cards. */
+.star-card__flat {
+  display: grid;
+  align-content: end;
+  justify-items: start;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  padding: 12%;
+  border: 1px solid rgb(91 210 255 / 0.35);
+  border-radius: inherit;
+  background:
+    radial-gradient(90% 50% at 50% 30%, rgb(91 210 255 / 0.18), transparent 70%),
+    linear-gradient(180deg, #0d2038, #05090f);
+  text-align: left;
+}
+
+.star-card__flat b {
+  margin-bottom: auto;
+  font-size: 0.875rem;
+}
+
+.star-card__name {
+  font-weight: 760;
+  font-stretch: 108%;
+  line-height: 1.1;
+}
+
+.star-card__role {
+  font-size: 0.6875rem;
+  font-weight: 650;
+  font-stretch: var(--label-stretch);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+/* ── The drawn card ── */
+.drawn {
+  position: fixed;
+  inset: 0;
+  z-index: 180;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: calc(var(--header-height) + 20px) var(--gutter) 32px;
+}
+
+/* The open crystal is drawn by the 3D scene, behind the page: the backdrop keeps a soft window
+   over it (the scene sets --hole-* to follow the card), and the scene dims itself to match. */
+.drawn__backdrop {
+  --hole-x: 0px;
+  --hole-y: 0px;
+  --hole-w: 0px;
+  --hole-h: 0px;
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 0.6);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  mask-image:
+    linear-gradient(#000 0 0),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cfilter id='f' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='5'/%3E%3C/filter%3E%3Crect x='11' y='9' width='78' height='82' rx='10' filter='url(%23f)'/%3E%3C/svg%3E");
+  mask-size:
+    100% 100%,
+    var(--hole-w) var(--hole-h);
+  mask-position:
+    0 0,
+    var(--hole-x) var(--hole-y);
+  mask-repeat: no-repeat;
+  mask-composite: exclude;
+}
+
+.drawn__layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 380px) minmax(0, 560px);
+  align-items: center;
+  gap: clamp(28px, 4vw, 64px);
+  width: 100%;
+  max-width: 1040px;
+}
+
+.drawn__card {
+  width: 100%;
+}
+
+/* The spot the crystal flies to: just a box the size of the card. */
+.drawn__card--crystal {
+  aspect-ratio: 0.72;
+}
+
+.drawn__card .pc-card-wrapper,
+.drawn__card .pc-card {
+  --card-radius: 28px;
+}
+
+.drawn__card .pc-card {
+  width: 100%;
+  height: auto;
+  max-height: none;
+}
+
+.drawn__card .pc-details {
+  top: 2em;
+}
+
+.drawn__card .pc-details h3 {
+  font-size: clamp(1.6rem, 2.6vw, 2.25rem);
+  font-stretch: 110%;
+  letter-spacing: -0.02em;
+  background-image: linear-gradient(to bottom, #fff, #9fdcff);
+}
+
+.drawn__card .pc-details p {
+  top: -2px;
+  font-size: 0.875rem;
+  font-weight: 650;
+  font-stretch: var(--label-stretch);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  background-image: linear-gradient(to bottom, #fff, #ffb27a);
+}
+
+.drawn__info {
+  display: flex;
+  flex-direction: column;
+  max-height: min(calc(100svh - var(--header-height) - 64px), 720px);
+  padding: clamp(22px, 2.6vw, 32px);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 26px;
+  background:
+    radial-gradient(100% 50% at 0% 0%, rgb(44 156 240 / 0.16), transparent 60%),
+    rgb(9 10 13 / 0.94);
+  box-shadow: 0 40px 90px -30px rgb(0 0 0 / 0.9);
+  text-align: left;
+}
+
+.drawn__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.drawn__number {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+}
+
+.drawn__number span {
+  font-size: 0.875rem;
+  color: var(--text-faint);
+}
+
+.drawn__close {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.drawn__close:hover {
+  color: var(--text);
+  border-color: var(--ice);
+}
+
+.drawn__role {
+  margin: 18px 0 0;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  font-stretch: var(--label-stretch);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+.drawn__name {
+  margin: 6px 0 0;
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  font-weight: 780;
+  font-stretch: 115%;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.drawn__scroll {
+  flex: 1;
+  min-height: 0;
+  margin-top: 18px;
+  padding: 0 6px 28px 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* More below: the last lines fade out instead of being cut. */
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 32px), transparent);
+}
+
+.drawn__bio {
+  margin: 0 0 12px;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.drawn__label {
+  margin: 18px 0 8px;
+  font-size: 0.6875rem;
+  font-weight: 650;
+  font-stretch: var(--label-stretch);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.drawn__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.drawn__chips li {
+  padding: 6px 12px;
+  border: 1px solid rgb(91 210 255 / 0.32);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  color: var(--ice);
+}
+
+.drawn__facts {
+  display: grid;
+  margin: 20px 0 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.drawn__facts div {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--hairline);
+  font-size: 0.9375rem;
+}
+
+.drawn__facts dt {
+  color: var(--text-faint);
+}
+
+.drawn__facts dd {
+  margin: 0;
+}
+
+.drawn__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.drawn__links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 650;
+  color: var(--ice);
+  text-decoration: none;
+}
+
+.drawn__scroll .example-tag {
+  margin-top: 16px;
+}
+
+.drawn__nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+}
+
+.drawn__nav button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.05);
+  font-size: 0.875rem;
+  font-weight: 650;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.drawn__nav button:hover {
+  background: rgb(91 210 255 / 0.14);
+}
+
+@media (max-width: 860px) {
+  .drawn {
+    place-items: start center;
+  }
+
+  .drawn__layout {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .drawn__card {
+    width: min(64vw, 260px);
+  }
+
+  .drawn__info {
+    width: 100%;
+    max-height: none;
+  }
+
+  .drawn__scroll {
+    padding-bottom: 0;
+    overflow: visible;
+    mask-image: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .drawn__facts div {
+    grid-template-columns: 6.5rem 1fr;
+  }
+}
+

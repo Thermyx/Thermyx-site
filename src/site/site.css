@@ -162,20 +162,114 @@
   color: var(--text);
 }
 
-/* The wordmark, huge and faint, across the foot of every page. */
+/* The wordmark, huge and faint across the foot of every page: React Bits' TextPressure, set in
+   Archivo, swelling toward the pointer. */
 .site-footer__wordmark {
-  margin: 56px 0 0;
+  max-width: var(--content);
+  margin: 48px auto 0;
+  overflow: hidden;
+  user-select: none;
+}
+
+.site-footer__wordmark .text-pressure-title {
+  line-height: 0.8 !important;
+  font-weight: 800;
+}
+
+.site-footer__wordmark-static {
+  margin: 0;
   font-size: clamp(4rem, 16.5vw, 16rem);
   font-weight: 800;
   font-stretch: 125%;
   line-height: 0.8;
   letter-spacing: -0.05em;
   text-align: center;
-  background: var(--wordmark-fill);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  user-select: none;
+  text-transform: uppercase;
+  color: var(--wordmark-ink);
+}
+
+/* Follow the build: a band of channel cards, edge to edge, between thermal hairlines. */
+.site-footer__follow {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  margin: -72px calc(var(--gutter) * -1) 56px;
+  padding: 40px 0 22px;
+  background:
+    radial-gradient(60% 120% at 15% 0%, rgb(44 156 240 / 0.12), transparent 70%),
+    radial-gradient(50% 120% at 90% 100%, rgb(255 106 19 / 0.1), transparent 70%);
+}
+
+.site-footer__follow::before,
+.site-footer__follow::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--ice) 25%, var(--ember) 75%, transparent);
+  opacity: 0.5;
+}
+
+.site-footer__follow::after {
+  inset: auto 0 0;
+}
+
+.site-footer__follow-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 24px;
+  width: 100%;
+  max-width: var(--content);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.site-footer__follow-title {
+  margin: 0;
+  font-size: clamp(1.75rem, 3.4vw, 3rem);
+  font-weight: 760;
+  font-stretch: 115%;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.site-footer__follow-title span {
+  color: var(--ember);
+}
+
+.site-footer__follow-note {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--text-faint);
+}
+
+/* min-width: 0 keeps the grid cell from growing to fit the loop (which would ask for more copies,
+   which would grow the cell...). */
+.site-footer__follow .social-loop {
+  min-width: 0;
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+.site-footer__email {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 1px solid var(--hairline-strong);
+  transition:
+    color var(--dur-micro) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-out);
+}
+
+.site-footer__email:hover {
+  color: var(--text);
+  border-color: var(--ice-ink, var(--ice));
 }
 
 .site-footer__legal {
@@ -194,4 +288,19 @@
 .site-footer__legal p {
   max-width: 60ch;
   margin: 0;
+}
+
+/* "Example" marker on template content (any page). */
+.example-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 1px dashed rgb(255 155 61 / 0.5);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--amber);
 }

@@ -5,8 +5,9 @@ import SpotlightCard from "../components/SpotlightCard.jsx";
 import { PAGES } from "../site/pages.js";
 import WordRise from "../ui/WordRise.jsx";
 
-// Posts { email } as JSON to VITE_WAITLIST_ENDPOINT (Formspree-compatible). Until that is set, the
-// form says sign-ups aren't connected rather than pretending to succeed.
+// Posts { email, _subject } as JSON to VITE_WAITLIST_ENDPOINT. Formspree (https://formspree.io/f/…)
+// and FormSubmit (https://formsubmit.co/ajax/<address>) both accept it as-is; see the README. Until
+// the endpoint is set, the form says sign-ups aren't connected rather than pretending to succeed.
 const ENDPOINT = import.meta.env.VITE_WAITLIST_ENDPOINT;
 
 export default function Join() {
@@ -53,7 +54,13 @@ function WaitlistForm() {
   async function onSubmit(event) {
     event.preventDefault();
     const form = event.currentTarget;
-    const email = new FormData(form).get("email");
+    const data = new FormData(form);
+    const email = data.get("email");
+    // The hidden field is a honeypot: people never see it, form-filling bots do. Drop those quietly.
+    if (data.get("company")) {
+      setState({ status: "done", message: "You're on the list. We'll email you when there's news." });
+      return;
+    }
     if (!ENDPOINT) {
       setState({ status: "error", message: "Sign-ups aren't connected yet. Please check back soon." });
       return;
@@ -63,7 +70,7 @@ function WaitlistForm() {
       const response = await fetch(ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, _subject: "New Thermyx waitlist sign-up" }),
       });
       if (!response.ok) throw new Error(String(response.status));
       setState({ status: "done", message: "You're on the list. We'll email you when there's news." });
@@ -78,6 +85,7 @@ function WaitlistForm() {
       <label className="eyebrow waitlist__label" htmlFor="waitlist-email">
         Email
       </label>
+      <input className="waitlist__honeypot" type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" />
       <div className="waitlist__row">
         <input
           id="waitlist-email"

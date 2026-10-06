@@ -74,7 +74,12 @@
   align-items: flex-start;
 }
 
-.stage[data-mode="hero"] .hero__content {
+/* The stage passes the pointer to the 3D canvas; copy opts back in while it is showing, so it can
+   be selected and copied. */
+.stage[data-mode="hero"] .hero__content,
+.stage[data-mode="scrub"] .chapters__rail,
+.stage[data-mode="scrub"] .chapters__current,
+.stage[data-mode="play"] .playbar > * {
   pointer-events: auto;
 }
 

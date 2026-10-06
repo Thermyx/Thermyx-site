@@ -16,8 +16,10 @@ const styles = {
     margin: '-1px',
     overflow: 'hidden',
     clip: 'rect(0,0,0,0)',
-    border: 0
-    // Thermyx patch: no `visibility: hidden` (it hid the text from screen readers too)
+    border: 0,
+    // Thermyx patches: no `visibility: hidden` (it hid the text from screen readers too), and skipped
+    // by selection (so copying gets the visible text once)
+    userSelect: 'none'
   }
 };
 

@@ -195,7 +195,7 @@ function PhoneStage({ active, onPick, chips }) {
         ))}
       </nav>
       <p className="phone-stage__hint" aria-hidden="true">
-        Drag to turn it around
+        Drag to turn it
       </p>
     </div>
   );

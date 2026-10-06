@@ -5,6 +5,7 @@ import BlurText from "../components/BlurText.jsx";
 import DecryptedText from "../components/DecryptedText.jsx";
 import ShinyText from "../components/ShinyText.jsx";
 import SplitText from "../components/SplitText.jsx";
+import Magnet from "../components/Magnet.jsx";
 import StarBorder from "../components/StarBorder.jsx";
 import { COMPONENTS, PRODUCT_NAMES } from "../data/components.js";
 import CalloutLayer from "../explorer/CalloutLayer.jsx";
@@ -125,20 +126,22 @@ function Hero() {
         />
 
         <div className="hero__actions">
-          <StarBorder
-            as={Link}
-            to={WAITLIST_HREF}
-            className="hero__cta"
-            color="#5bd2ff"
-            speed="4.5s"
-            thickness={1}
-            backgroundColor="var(--signal)"
-            borderColor="transparent"
-            textColor="var(--on-signal)"
-          >
-            Join the waitlist
-            <ArrowRight size={17} strokeWidth={2.2} aria-hidden="true" />
-          </StarBorder>
+          <Magnet padding={70} magnetStrength={5} disabled={reducedMotion}>
+            <StarBorder
+              as={Link}
+              to={WAITLIST_HREF}
+              className="hero__cta"
+              color="#5bd2ff"
+              speed="4.5s"
+              thickness={1}
+              backgroundColor="var(--signal)"
+              borderColor="transparent"
+              textColor="var(--on-signal)"
+            >
+              Join the waitlist
+              <ArrowRight size={17} strokeWidth={2.2} aria-hidden="true" />
+            </StarBorder>
+          </Magnet>
           <a className="button button--ghost hero__secondary" href="#explore">
             See inside
             <ArrowDown size={16} strokeWidth={2} aria-hidden="true" />
@@ -173,11 +176,6 @@ function Hero() {
           ))}
         </dl>
       </div>
-
-      <p className="hero__scroll" aria-hidden="true">
-        <span className="hero__scroll-line" />
-        Scroll to take it apart
-      </p>
     </div>
   );
 }

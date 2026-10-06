@@ -8,6 +8,7 @@ import { useCallouts } from "./callouts.js";
 import { BG, CAMERA, DPR, GL } from "./constants.js";
 import ErrorBoundary from "./ErrorBoundary.jsx";
 import Lighting from "./Lighting.jsx";
+import TeamStar from "../pages/team/TeamStar.jsx";
 import "./SceneCanvas.css";
 import { stageScroll, useModel, useStage } from "./story.js";
 import TopographyBackdrop from "./TopographyBackdrop.jsx";
@@ -16,8 +17,8 @@ const onReady = () => useModel.setState({ status: "ready" });
 const onModelError = () => useModel.setState({ status: "error" });
 const onCanvasError = () => useModel.setState({ status: "unsupported" });
 
-// The one WebGL canvas, fixed behind every page: the Topography backdrop everywhere, and on the
-// home page the 3D model (CameraRig hides it elsewhere). One canvas because the glass needs the
+// The one WebGL canvas, fixed behind every page: the Topography backdrop everywhere, on the home
+// page the 3D model (CameraRig hides it elsewhere), and on the Team page its crystal cards. One canvas because the glass needs the
 // backdrop inside its scene to refract it (see TopographyBackdrop), and one context is cheaper
 // than two. The model streams in behind its own boundary, so a failed load leaves the backdrop up.
 // Cream pages have their own backdrop: there the canvas is hidden and its loop stopped.
@@ -40,6 +41,8 @@ export default function SceneCanvas() {
           <color attach="background" args={[BG]} />
           <TopographyBackdrop />
           <Lighting />
+          {/* The Team page's crystal cards (drawn only while it's open). */}
+          <TeamStar />
           <ErrorBoundary key={attempt} onError={onModelError}>
             <Suspense fallback={null}>
               <Assembly onReady={onReady} />

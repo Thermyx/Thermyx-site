@@ -1,4 +1,8 @@
 import { Link } from "react-router-dom";
+import TextPressure from "../components/TextPressure.jsx";
+import { CONTACT_EMAIL } from "../data/socials.js";
+import { useReducedMotion } from "../lib/useReducedMotion.js";
+import SocialLoop from "../ui/SocialLoop.jsx";
 import { PAGES, WAITLIST_HREF } from "./pages.js";
 
 // Source for the note: the app README, "Prototype 1 deployment checklist".
@@ -9,14 +13,30 @@ const EXPLORE = [
   { href: "/#safety", label: "Safety" },
   { href: WAITLIST_HREF, label: "Waitlist" },
 ];
+// Archivo's own axes, for the wordmark (it widens and thickens near the pointer).
+const WIDTH_RANGE = [62, 125];
+const WEIGHT_RANGE = [200, 900];
 
 export default function Footer() {
+  const reducedMotion = useReducedMotion();
   return (
     <footer className="site-footer">
+      <section className="site-footer__follow" aria-labelledby="follow-title">
+        <div className="site-footer__follow-head">
+          <h2 id="follow-title" className="site-footer__follow-title">
+            Follow the build<span aria-hidden="true">.</span>
+          </h2>
+          <p className="site-footer__follow-note">Videos, photos, and news, as they happen.</p>
+        </div>
+        <SocialLoop />
+      </section>
       <div className="site-footer__inner">
         <div className="site-footer__brand">
           <img src="/brand/thermyx-badge.png" alt="" width="478" height="476" loading="lazy" decoding="async" />
           <p className="site-footer__tagline">Climate control for your feet.</p>
+          <a className="site-footer__email" href={`mailto:${CONTACT_EMAIL}`}>
+            {CONTACT_EMAIL}
+          </a>
         </div>
         <nav className="site-footer__nav" aria-label="Footer">
           <div>
@@ -41,9 +61,26 @@ export default function Footer() {
           </div>
         </nav>
       </div>
-      <p className="site-footer__wordmark" aria-hidden="true">
-        Thermyx
-      </p>
+      <div className="site-footer__wordmark" aria-hidden="true">
+        {reducedMotion ? (
+          <p className="site-footer__wordmark-static">Thermyx</p>
+        ) : (
+          <TextPressure
+            as="p"
+            text="Thermyx"
+            fontFamily="Archivo Variable"
+            fontUrl={null}
+            textColor="var(--wordmark-ink)"
+            width
+            weight
+            italic={false}
+            widthRange={WIDTH_RANGE}
+            weightRange={WEIGHT_RANGE}
+            sizeFactor={1.32}
+            minFontSize={56}
+          />
+        )}
+      </div>
       <div className="site-footer__legal">
         <p>
           Thermyx is an investigational prototype in supervised field evaluation. It is not a medical device and is not

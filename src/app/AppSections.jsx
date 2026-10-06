@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AnimatedContent from "../components/AnimatedContent.jsx";
-import ScrollReveal from "../components/ScrollReveal.jsx";
+import CircularText from "../components/CircularText.jsx";
 import SpotlightCard from "../components/SpotlightCard.jsx";
 import { useReducedMotion } from "../lib/useReducedMotion.js";
 import { WAITLIST_HREF } from "../site/pages.js";
@@ -331,17 +331,22 @@ export function TrustSection() {
 export function AppCta() {
   return (
     <section className="app-cta" aria-labelledby="app-cta-title">
-      <motion.img
-        className="app-icon app-cta__icon"
-        src="/brand/thermyx-app-icon-256.png"
-        width="256"
-        height="256"
-        alt=""
-        initial={{ opacity: 0, y: 30, rotate: -6, scale: 0.9 }}
-        whileInView={{ opacity: 1, y: 0, rotate: 0, scale: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.9, ease: EASE }}
-      />
+      <div className="app-cta__badge">
+        <div className="app-cta__ring" aria-hidden="true">
+          <CircularText text="THERMYX ✦ FOR IPHONE ✦ COMING SOON ✦ " spinDuration={28} onHover="speedUp" className="app-cta__circular" />
+        </div>
+        <motion.img
+          className="app-icon app-cta__icon"
+          src="/brand/thermyx-app-icon-256.png"
+          width="256"
+          height="256"
+          alt=""
+          initial={{ opacity: 0, y: 30, rotate: -6, scale: 0.9 }}
+          whileInView={{ opacity: 1, y: 0, rotate: 0, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, ease: EASE }}
+        />
+      </div>
       <h2 id="app-cta-title" className="app-cta__title">
         <WordRise text="Thermyx" inView /> <WordRise as="em" text="for iPhone." inView delay={0.12} />
       </h2>

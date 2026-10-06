@@ -1,0 +1,32 @@
+/* Thermyx patch: scoped class names (the original used a global `.card`), and a hidden state for
+   a card drawn out of the hand. */
+.bounce-cards {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 400px;
+  height: 400px;
+}
+
+.bounce-card {
+  position: absolute;
+  width: 200px;
+  aspect-ratio: 1;
+  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  opacity: 0; /* Thermyx patch: hidden until GSAP deals the hand in (no flash before the deal) */
+  transition: opacity 0.25s ease;
+}
+
+.bounce-card[data-hidden] {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.bounce-card .bounce-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

@@ -37,7 +37,9 @@ svg {
 }
 
 button,
-input {
+input,
+textarea,
+select {
   font: inherit;
   color: inherit;
 }
@@ -70,6 +72,11 @@ a {
 .mono {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+}
+
+/* Screen-reader copies of animated text: skipped by selection, so copying gets the text once. */
+.word-rise__sr {
+  user-select: none;
 }
 
 .visually-hidden {

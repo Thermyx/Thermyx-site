@@ -1,4 +1,7 @@
 import { Link } from "react-router-dom";
+import Magnet from "../components/Magnet.jsx";
+import { useMediaQuery } from "../lib/useMediaQuery.js";
+import { useReducedMotion } from "../lib/useReducedMotion.js";
 import { WAITLIST_HREF } from "../site/pages.js";
 
 // The App Store listing, once there is one. Until then the badge says the app is coming and
@@ -8,6 +11,8 @@ export const APP_STORE_URL = null;
 
 export default function AppStoreBadge({ className = "" }) {
   const live = Boolean(APP_STORE_URL);
+  const finePointer = useMediaQuery("(pointer: fine)");
+  const reducedMotion = useReducedMotion();
   const content = (
     <>
       <svg className="store-badge__logo" viewBox="0 0 24 24" aria-hidden="true">
@@ -20,7 +25,7 @@ export default function AppStoreBadge({ className = "" }) {
     </>
   );
   const classes = `store-badge ${className}`.trim();
-  return live ? (
+  const badge = live ? (
     <a className={classes} href={APP_STORE_URL} target="_blank" rel="noreferrer">
       {content}
     </a>
@@ -28,5 +33,11 @@ export default function AppStoreBadge({ className = "" }) {
     <Link className={classes} to={WAITLIST_HREF} title="Not on the App Store yet. Join the waitlist to hear when it is." data-soon="">
       {content}
     </Link>
+  );
+  // React Bits' Magnet: the badge leans toward a nearby pointer.
+  return (
+    <Magnet padding={70} magnetStrength={5} disabled={!finePointer || reducedMotion}>
+      {badge}
+    </Magnet>
   );
 }

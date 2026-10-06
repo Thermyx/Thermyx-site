@@ -732,6 +732,14 @@
   margin-top: 12px;
 }
 
+.waitlist__honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
 .waitlist__label {
   display: block;
   margin-bottom: 10px;

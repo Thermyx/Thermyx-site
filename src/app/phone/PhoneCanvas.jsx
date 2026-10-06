@@ -27,7 +27,10 @@ const MOTION = {
   sway: { yaw: 0.06, pitch: 0.02, lift: 0.03 },
   parallax: { yaw: 0.36, pitch: 0.16 },
   drag: { speed: 0.012, pitchSpeed: 0.006, maxPitch: 0.5, release: 4 },
-  intro: { rate: 1.8, lift: 0.28 },
+  // The phone never turns its back: yaw stops at a side view either way, easing into the limit.
+  yawLimit: Math.PI / 2 - 0.02,
+  yawKnee: 1.05,
+  intro: { rate: 1.8, lift: 0.28, yaw: 0.85 }, // arrives turning in from the side
   fade: 4.5, // 1/s, screen crossfade
 };
 
@@ -82,7 +85,7 @@ function Phone({ screen }) {
 
 function createRig(reducedMotion) {
   return {
-    yaw: reducedMotion ? REST.welcome[0] : REST.welcome[0] - Math.PI, // arrives showing its back
+    yaw: reducedMotion ? REST.welcome[0] : REST.welcome[0] - MOTION.intro.yaw,
     pitch: 0,
     intro: reducedMotion ? 0 : 1,
     dragYaw: 0,
@@ -118,13 +121,13 @@ function stepPhone({ clock, camera, size }, dt, rig, group, material, screens, s
     pitch += Math.sin(t * 0.6) * MOTION.sway.pitch - (pointer.y - 0.5) * MOTION.parallax.pitch;
   }
   if (!rig.dragging) {
-    // Let go: spring back to face the viewer (to the nearest whole turn, so it never unwinds).
-    rig.dragYaw = MathUtils.damp(rig.dragYaw, Math.round(rig.dragYaw / (Math.PI * 2)) * Math.PI * 2, MOTION.drag.release, dt);
+    // Let go: spring back to face the viewer.
+    rig.dragYaw = MathUtils.damp(rig.dragYaw, 0, MOTION.drag.release, dt);
     rig.dragPitch = MathUtils.damp(rig.dragPitch, 0, MOTION.drag.release, dt);
   }
   rig.intro = MathUtils.damp(rig.intro, 0, MOTION.intro.rate, dt);
   rig.kick = MathUtils.damp(rig.kick, 0, 3, dt);
-  yaw += rig.dragYaw - rig.intro * Math.PI + rig.kick * 0.22;
+  yaw = softLimit(yaw + rig.dragYaw - rig.intro * MOTION.intro.yaw + rig.kick * 0.22, MOTION.yawKnee, MOTION.yawLimit);
   pitch += rig.dragPitch;
 
   const follow = reducedMotion || rig.dragging ? 1 : 1 - Math.exp(-MOTION.follow * dt);
@@ -139,6 +142,15 @@ function stepPhone({ clock, camera, size }, dt, rig, group, material, screens, s
   const width = PHONE.width * PHONE.scale * 1.75;
   camera.position.set(0, 0.02, Math.max(height / (2 * tan), width / (2 * tan * (size.width / size.height))));
   camera.lookAt(0, 0, 0);
+}
+
+// Passes values up to `knee` through unchanged, then eases them toward `limit` without ever
+// reaching it (a rubber band), keeping the sign.
+function softLimit(value, knee, limit) {
+  const size = Math.abs(value);
+  if (size <= knee) return value;
+  const room = limit - knee;
+  return Math.sign(value) * (knee + room * Math.tanh((size - knee) / room));
 }
 
 // Mouse, pen, or a sideways touch drag turns the phone (vertical swipes still scroll the page).
@@ -156,7 +168,8 @@ function useDrag(get, rig) {
     const onMove = (event) => {
       if (!last || !rig.current) return;
       const r = rig.current;
-      r.dragYaw += (event.clientX - last.x) * MOTION.drag.speed;
+      // Held within the limit (plus a little, for the rubber band), so it never winds up.
+      r.dragYaw = MathUtils.clamp(r.dragYaw + (event.clientX - last.x) * MOTION.drag.speed, -2.2, 2.2);
       r.dragPitch = MathUtils.clamp(r.dragPitch + (event.clientY - last.y) * MOTION.drag.pitchSpeed, -MOTION.drag.maxPitch, MOTION.drag.maxPitch);
       last = { x: event.clientX, y: event.clientY };
     };

@@ -29,8 +29,9 @@ export default function Header() {
     <header className="site-header" data-scrolled={scrolled || open || undefined}>
       <div className="site-header__bar">
         <Link to="/" className="site-header__brand" aria-label="Thermyx home">
+          {/* Two inks, one frame: both files are cropped identically (2004 × 567) so they match. */}
           <img className="site-header__logo--light" src="/brand/thermyx-logo-light.png" alt="" width="2004" height="567" decoding="async" />
-          <img className="site-header__logo--navy" src="/brand/thermyx-logo.png" alt="" width="2172" height="724" decoding="async" />
+          <img className="site-header__logo--navy" src="/brand/thermyx-logo-navy.png" alt="" width="2004" height="567" decoding="async" />
         </Link>
 
         <nav className="site-nav" aria-label="Main" onPointerLeave={() => setHovered(null)}>

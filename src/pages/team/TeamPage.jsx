@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight, ArrowUpRight, Shuffle as ShuffleIcon, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import ProfileCard from "../../components/ProfileCard.jsx";
 import { TEAM } from "../../data/team.js";
 import { useModel } from "../../explorer/story.js";
@@ -9,10 +10,7 @@ import { useReducedMotion } from "../../lib/useReducedMotion.js";
 import { DRAW_TIME, POINT_ANGLES, shuffleStar, starDom, starLayout, useStar } from "./star.js";
 import "./team.css";
 
-const PATTERN = "/team/mark-pattern.png"; // white on black: the ProfileCard masks its shine by brightness
 const INNER = "linear-gradient(150deg, rgba(44, 156, 240, 0.5) 0%, rgba(10, 46, 88, 0.35) 45%, rgba(255, 106, 19, 0.42) 100%)";
-const pad = (n) => String(n).padStart(2, "0");
-const numberOf = (person) => TEAM.indexOf(person) + 1;
 const byId = (id) => TEAM.find((person) => person.id === id);
 
 // The team as five crystal cards at the points of a slowly turning pentagram, which turns further
@@ -124,18 +122,22 @@ export default function TeamPage() {
         </div>
       </section>
 
-      <AnimatePresence>
-        {person && (
-          <Drawn
-            key="drawn"
-            person={person}
-            drawn={drawn}
-            onClose={putBack}
-            onStep={step}
-            flat={flat}
-          />
-        )}
-      </AnimatePresence>
+      {/* On <body>: inside <main> the dialog would share main's layer, under the footer. */}
+      {createPortal(
+        <AnimatePresence>
+          {person && (
+            <Drawn
+              key="drawn"
+              person={person}
+              drawn={drawn}
+              onClose={putBack}
+              onStep={step}
+              flat={flat}
+            />
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
     </div>
   );
 }
@@ -167,7 +169,6 @@ function StarCard({ person, flat, onDraw }) {
     >
       {flat && (
         <span className="star-card__flat" aria-hidden="true">
-          <b className="mono">{pad(numberOf(person))}</b>
           <span className="star-card__name">{person.name}</span>
           <span className="star-card__role">{person.role}</span>
         </span>
@@ -275,7 +276,7 @@ function Drawn({ person, drawn, onClose, onStep, flat }) {
               handle={null}
               showUserInfo={false}
               avatarUrl={person.photo}
-              iconUrl={PATTERN}
+              iconUrl={null}
               grainUrl={null}
               innerGradient={INNER}
               behindGlowColor="rgba(91, 210, 255, 0.55)"
@@ -296,9 +297,6 @@ function Drawn({ person, drawn, onClose, onStep, flat }) {
           transition={{ duration: 0.5, delay: flat ? 0.1 : drawn.stepped ? 0.3 : 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="drawn__top">
-            <p className="drawn__number mono">
-              {pad(numberOf(person))} <span>/ {pad(TEAM.length)}</span>
-            </p>
             <button ref={closeRef} type="button" className="drawn__close" onClick={close}>
               <X size={18} aria-hidden="true" />
               <span>Back to the star</span>

@@ -1,6 +1,6 @@
 # Thermyx site
 
-The Thermyx product site. Home: a hero with the insole and power pack in 3D, a scroll that turns and takes them apart beside five chapters on how it works, an explorable exploded view (hover a part for what it does, click to pin, drag the cards), then the pair, the app, safety, and a waitlist. App (`/app`) is its own cream page: a tour of the iPhone app beside a 3D phone. Team, Validation, Media, and Contact are built and filled with clearly marked examples until real content arrives (see "Editing content").
+The Thermyx product site. Home: a hero with the insole and power pack in 3D, a scroll that turns and takes them apart beside five chapters on how it works, an explorable exploded view (hover a part for what it does, click to pin, drag the cards), then the pair, the app, safety, and a waitlist. App (`/app`) is its own cream page: a tour of the iPhone app beside a 3D phone. Team (the five founders), Media, and Contact are built; Validation is built but not routed yet, and anything still a placeholder is marked as an example (see "Editing content").
 
 ## Run
 
@@ -28,15 +28,15 @@ Until it's set, the form tells visitors sign-ups aren't connected yet; it never 
 
 ## Contact form
 
-The Contact page posts `{ name, email, topic, message, _subject, _replyto }` to `VITE_CONTACT_ENDPOINT`, or to the waitlist's endpoint if that's the only one set (Formspree or FormSubmit, as above; `_replyto` lets you reply straight to the sender). With neither set, "Mail the card" opens the visitor's own email app with the message filled in, addressed to thermyx.contact@gmail.com, so nothing is lost.
+The Contact page (three steps: topic, who's writing, the message) posts `{ topic, name, email, organization, message, _subject, _replyto }` to `VITE_CONTACT_ENDPOINT`, or to the waitlist's endpoint if that's the only one set (Formspree or FormSubmit, as above; `_replyto` lets you reply straight to the sender). With neither set, "Mail the card" opens the visitor's own email app with the message filled in, addressed to thermyx.contact@gmail.com, so nothing is lost.
 
 ## Editing content
 
 Each page reads plain data files; edit them and the page follows.
 
-- **Socials** (`src/data/socials.js`): the email and every channel, used by the footer's "Follow the build" loop, the Contact page, and Media's channel tiles.
+- **Socials** (`src/data/socials.js`): the email and every channel, used by the footer's "Follow the build" loop and Media's channel tiles. The Contact page's topics are at the top of `src/pages/contact/ContactPage.jsx`.
 - **Media** (`src/data/media.js`): two sections. *Thermyx Media* is the channel tiles (`CHANNELS`) and the posts, press, and recognition list (`POSTS`). *Selected Sources* (`SOURCES`) is research, guidance, articles, and collaborations; the first five are the references the app's Learning Center cites, with checked links. Entries with `example: true` are templates. `/media?section=sources` opens the second section.
-- **Team** (`src/data/team.js`): five people, as crystal cards at the points of a slowly turning star (numbered in this order; Shuffle only moves them round the star). Add a photo by putting it in `public/team/` and setting `photo: "/team/<file>"`: it fills the card, and the name's letters are cut from it. Portrait photos work best (about 5:7, face in the upper half). Until then each card shows an etched bust. Clicking a card opens the big card with the bio paragraphs, focus, background, and links.
+- **Team** (`src/data/team.js`): five people, as crystal cards at the points of a slowly turning star (Shuffle only moves them round it). Each card shows the photo (`public/team/`, transparent background; the card adds its own backing, lit in the photo's tint), the name in white, and the role; without a photo it shows an etched bust. Clicking a card flies it out beside the bio paragraphs, focus, background, and links.
 - **Validation** is a placeholder. A masonry version (React Bits' Masonry, tiles that open draggable detail cards) is built in `src/pages/validation/` with its data in `src/data/validation.js`; to bring it back, route it in `src/App.jsx`.
 
 ## The model

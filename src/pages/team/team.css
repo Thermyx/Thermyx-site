@@ -1,6 +1,7 @@
 /* Team: five crystal cards on a turning star (drawn in the 3D scene behind the page; the page
    lays a button over each), and a drawn card that opens over the page. */
-.team {
+.team,
+.drawn {
   /* The ProfileCard's holographic bands, in the brand's blues and oranges (rainbow by default). */
   --sunpillar-1: hsl(205 100% 70%);
   --sunpillar-2: hsl(190 100% 72%);
@@ -18,6 +19,19 @@
 
 html[data-dialog-open] {
   overflow: hidden;
+}
+
+/* The open crystal is drawn on the canvas behind the page, so no page text may sit in the window
+   over it: the title (near the top of the page) and the footer (near the bottom) step out while a
+   card is open. They come back once it has nearly flown home, so they don't cross it on the way. */
+.team-star__head,
+.site-footer {
+  transition: opacity 300ms 550ms var(--ease-out);
+}
+
+html[data-dialog-open] :is(.team-star__head, .site-footer) {
+  opacity: 0;
+  transition-delay: 0s;
 }
 
 /* ── The star ── */
@@ -304,7 +318,7 @@ html[data-dialog-open] {
 .drawn__top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
 }
 

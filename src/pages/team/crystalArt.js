@@ -1,38 +1,33 @@
 // The art inside each crystal card, drawn once per person on 2D canvases:
-//   back     the layer at the back of the glass: the photo, filling the card, frosted and
-//            darkened toward the bottom; until there's a photo, a dark backing with a glow
-//   etch     the layer etched mid-glass: the corner numbers and mark, the role, and the name,
-//            whose letters are filled with the photo itself (brightened), so the type is cut
-//            from the person; until there's a photo, the brand's cool-to-warm gradient
+//   back     the layer at the back of the glass: the photo (its background is transparent) on
+//            a dark backing lit in the photo's own tint, frosted and darkened toward the
+//            bottom; until there's a photo, a dark backing with a glow
+//   etch     the layer etched mid-glass: the name in white, first name over last, and the role
 //   sticker  the holographic seal's print (ink only; the foil is a shader)
 // plus, until there's a photo, the points of a laser-etched bust floating in the glass.
 
 export const ART = { width: 640, height: 923 }; // the inner plane, 0.88 × 1.269 card widths
 const PAD = 34;
-const INK = "#eaf2fa";
+const INK = "#f4f8fc";
 const AMBER = "#ff9b3d";
 const FONT = '"Archivo Variable", "Archivo", system-ui, sans-serif';
 const MONO = '"JetBrains Mono Variable", ui-monospace, monospace';
 
-let shared = null;
-function sharedAssets() {
-  shared ??= Promise.all([
+let fonts = null;
+function loadFonts() {
+  fonts ??= Promise.all([
     document.fonts.load(`800 74px ${FONT}`),
-    document.fonts.load(`700 38px ${FONT}`),
+    document.fonts.load(`700 34px ${FONT}`),
     document.fonts.load(`700 44px ${MONO}`),
-    loadImage("/team/mark.png"),
-  ]).then(([, , , mark]) => ({ mark }));
-  return shared;
+  ]);
+  return fonts;
 }
 
 export async function cardArt(person, number) {
-  const [{ mark }, photo] = await Promise.all([
-    sharedAssets(),
-    person.photo ? loadImage(person.photo).catch(() => null) : null,
-  ]);
+  const [, photo] = await Promise.all([loadFonts(), person.photo ? loadImage(person.photo).catch(() => null) : null]);
   return {
     back: photo ? photoBack(photo) : plainBack(),
-    etch: etch(person, number, photo, mark),
+    etch: etch(person),
     sticker: stickerPrint(number),
     photo: Boolean(photo),
   };
@@ -90,6 +85,14 @@ function plainBack() {
 function photoBack(photo) {
   const [element, ctx] = canvas();
   const { width, height } = element;
+  // The backing: near black, lit softly behind the head in the photo's own tint.
+  const base = ctx.createLinearGradient(0, 0, 0, height);
+  base.addColorStop(0, "#10141c");
+  base.addColorStop(1, "#05060a");
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, width, height);
+  const [r, g, b] = tintOf(photo);
+  glow(ctx, width / 2, height * 0.36, width * 0.7, `${r}, ${g}, ${b}`, 0.32);
   cover(ctx, photo);
   // Frost: the same photo, blurred (drawn tiny, then scaled up), fading in toward the bottom.
   const [small, smallCtx] = canvas(40, 58);
@@ -106,9 +109,28 @@ function photoBack(photo) {
   frostCtx.fillStyle = fade;
   frostCtx.fillRect(0, 0, width, height);
   ctx.drawImage(frost, 0, 0);
-  // Shade the corner the number sits in.
-  glow(ctx, 0, 0, width * 0.45, "3, 7, 14", 0.55);
   return element;
+}
+
+// The photo's average color where it isn't transparent, brightened: the tint of its backing.
+function tintOf(photo) {
+  const [, smallCtx] = canvas(24, 36);
+  cover(smallCtx, photo);
+  const { data } = smallCtx.getImageData(0, 0, 24, 36);
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  let n = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] < 200) continue;
+    r += data[i];
+    g += data[i + 1];
+    b += data[i + 2];
+    n++;
+  }
+  if (!n) return [91, 210, 255];
+  const lift = 200 / Math.max(r / n, g / n, b / n, 1);
+  return [r, g, b].map((c) => Math.round(Math.min(255, (c / n) * lift)));
 }
 
 function glow(ctx, x, y, radius, rgb, alpha) {
@@ -119,72 +141,34 @@ function glow(ctx, x, y, radius, rgb, alpha) {
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
-function etch(person, number, photo, mark) {
+// The name in white, first name over last name, both at the one size that fits the longest; the
+// role under it in amber, shrunk until it fits on one line.
+function etch(person) {
   const [element, ctx] = canvas();
   const { width, height } = element;
-  const label = String(number).padStart(2, "0");
+  const maxWidth = width - PAD * 2;
+  const [first, ...rest] = person.name.split(" ");
+  const lines = rest.length ? [first, rest.join(" ")] : [first];
 
-  corner(ctx, label, mark, PAD, PAD);
-  ctx.save();
-  ctx.translate(width, height);
-  ctx.rotate(Math.PI);
-  corner(ctx, label, mark, PAD, PAD);
-  ctx.restore();
-
-  // The name: as large as fits on one line (down to 52 px), else two lines.
-  const maxWidth = width - PAD * 2 - 40;
   let size = 74;
+  const widest = () => Math.max(...lines.map((line) => ctx.measureText(line).width));
   setFont(ctx, 800, size, "semi-expanded");
-  while (size > 52 && ctx.measureText(person.name).width > maxWidth) setFont(ctx, 800, --size, "semi-expanded");
-  const lines = ctx.measureText(person.name).width > maxWidth ? wrap(ctx, person.name, maxWidth) : [person.name];
-  const lineHeight = size * 0.98;
-  const roleY = height - 100;
-  const lastBaseline = roleY - 50;
+  while (size > 40 && widest() > maxWidth) setFont(ctx, 800, --size, "semi-expanded");
+  const lineHeight = size * 0.94;
 
-  // Letters filled with the photo (lined up with the back layer, brightened) or the gradient.
-  const [type, typeCtx] = canvas();
-  if (photo) {
-    cover(typeCtx, photo);
-    typeCtx.globalCompositeOperation = "lighter";
-    typeCtx.globalAlpha = 0.5;
-    cover(typeCtx, photo);
-    typeCtx.globalAlpha = 1;
-  } else {
-    const g = typeCtx.createLinearGradient(PAD, 0, width - PAD, 0);
-    g.addColorStop(0, "#7fe0ff");
-    g.addColorStop(0.5, "#f4fbff");
-    g.addColorStop(1, "#ffb27a");
-    typeCtx.fillStyle = g;
-    typeCtx.fillRect(0, 0, width, height);
-  }
-  typeCtx.globalCompositeOperation = "destination-in";
-  setFont(typeCtx, 800, size, "semi-expanded");
-  typeCtx.fillStyle = "#000";
-  lines.forEach((line, i) => {
-    typeCtx.fillText(line, PAD, lastBaseline - (lines.length - 1 - i) * lineHeight);
-  });
-  ctx.drawImage(type, 0, 0);
-  if (photo) {
-    // A hairline of light round each letter, so dark parts of the photo still read.
-    ctx.strokeStyle = "rgba(234, 242, 250, 0.6)";
-    ctx.lineWidth = 2;
-    setFont(ctx, 800, size, "semi-expanded");
-    lines.forEach((line, i) => ctx.strokeText(line, PAD, lastBaseline - (lines.length - 1 - i) * lineHeight));
-  }
-
-  setFont(ctx, 700, 38, "condensed");
+  let roleSize = 34;
+  setFont(ctx, 700, roleSize, "condensed");
+  const role = person.role.toUpperCase();
+  while (roleSize > 20 && spacedWidth(ctx, role, 0.12) > maxWidth) setFont(ctx, 700, --roleSize, "condensed");
+  const roleY = height - 96;
   ctx.fillStyle = AMBER;
-  spaced(ctx, person.role.toUpperCase(), PAD + 2, roleY, 0.12);
-  return element;
-}
+  spaced(ctx, role, PAD + 2, roleY, 0.12);
 
-function corner(ctx, label, mark, x, y) {
-  setFont(ctx, 700, 48, "normal", MONO);
+  setFont(ctx, 800, size, "semi-expanded");
   ctx.fillStyle = INK;
-  ctx.textBaseline = "top";
-  ctx.fillText(label, x, y);
-  ctx.textBaseline = "alphabetic";
-  ctx.drawImage(mark, x + 6, y + 58, 44, 44);
+  const last = roleY - roleSize - 18;
+  lines.forEach((line, i) => ctx.fillText(line, PAD, last - (lines.length - 1 - i) * lineHeight));
+  return element;
 }
 
 function setFont(ctx, weight, size, stretch, family = FONT) {
@@ -192,21 +176,9 @@ function setFont(ctx, weight, size, stretch, family = FONT) {
   if ("fontStretch" in ctx) ctx.fontStretch = stretch;
 }
 
-function wrap(ctx, text, maxWidth) {
-  const words = text.split(" ");
-  const lines = [];
-  let line = "";
-  for (const word of words) {
-    const test = line ? `${line} ${word}` : word;
-    if (line && ctx.measureText(test).width > maxWidth) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = test;
-    }
-  }
-  if (line) lines.push(line);
-  return lines.slice(0, 2);
+function spacedWidth(ctx, text, em) {
+  const size = parseFloat(ctx.font.match(/(\d+(?:\.\d+)?)px/)[1]);
+  return [...text].reduce((sum, char) => sum + ctx.measureText(char).width + size * em, 0);
 }
 
 // Letter-spaced text, drawn a character at a time (canvas letterSpacing isn't everywhere yet).

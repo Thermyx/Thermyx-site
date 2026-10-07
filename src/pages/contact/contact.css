@@ -66,38 +66,232 @@
   gap: clamp(28px, 5vw, 72px);
 }
 
-/* ── The form: quiet underlined fields ── */
-.contact-form {
-  display: grid;
-  gap: 26px;
+/* ── The panel: the form on a solid surface, readable over the topography ── */
+.contact-panel {
+  position: relative;
+  padding: clamp(22px, 2.6vw, 34px);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.035), rgb(255 255 255 / 0) 40%),
+    rgb(8 10 14 / 0.92);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 40px 80px -40px rgb(0 0 0 / 0.9),
+    inset 0 1px 0 rgb(255 255 255 / 0.05);
 }
 
-.contact-form__label {
+.contact-form {
   display: block;
-  margin-bottom: 10px;
-  font-size: 0.75rem;
-  font-weight: 650;
-  font-stretch: var(--label-stretch);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+}
+
+/* React Bits' Stepper, fitted to the panel. */
+.contact-stepper.outer-container {
+  display: block;
+  padding: 0;
+}
+
+.contact-stepper .step-circle-container {
+  max-width: none;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.contact-stepper .step-indicator-row {
+  padding: 0 0 26px;
+}
+
+.contact-stepper .step-connector {
+  height: 2px;
+  margin: 0 12px;
+  background: var(--hairline-strong);
+}
+
+/* Room for focus rings inside the sliding steps. */
+.contact-stepper .step-default {
+  padding: 3px;
+}
+
+.contact-stepper .footer-container {
+  padding: 0;
+}
+
+.contact-stepper .footer-nav {
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.contact-stepper .back-button {
+  height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.contact-stepper .back-button:hover {
+  background: rgb(255 255 255 / 0.06);
+  color: var(--text);
+}
+
+.contact-stepper .next-button {
+  height: 52px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--signal);
+  font-size: 1rem;
+  font-weight: 680;
+  letter-spacing: 0;
+  color: var(--on-signal);
+}
+
+.contact-stepper .next-button:hover,
+.contact-stepper .next-button:active {
+  background: #46aaf4;
+}
+
+.contact-stepper :is(.back-button, .next-button):focus-visible {
+  outline: 2px solid var(--ice);
+  outline-offset: 3px;
+}
+
+/* The steps across the top: number (a check once done) and name. */
+.step-tab {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
   color: var(--text-faint);
 }
 
-.contact-form__topics {
+.step-tab[data-state="done"] {
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.step-tab[data-state="active"] {
+  color: var(--text);
+}
+
+.step-tab:disabled {
+  cursor: default;
+}
+
+.step-tab__dot {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  transition:
+    background-color 250ms var(--ease-out),
+    border-color 250ms var(--ease-out),
+    color 250ms var(--ease-out);
+}
+
+.step-tab[data-state="active"] .step-tab__dot {
+  border-color: var(--ice);
+  background: var(--ice);
+  color: var(--on-signal);
+}
+
+.step-tab[data-state="done"] .step-tab__dot {
+  border-color: var(--ice);
+  color: var(--ice);
+}
+
+.step-tab__label {
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.step-tab:focus-visible {
+  outline: 2px solid var(--ice);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+/* ── A step ── */
+.contact-step {
+  min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
 }
 
-.topic-row {
+.contact-step__title {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  margin: 0 0 18px;
+  padding: 0;
+  font-size: clamp(1.35rem, 2vw, 1.6rem);
+  font-weight: 720;
+  font-stretch: 108%;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.contact-step__topic {
+  padding: 4px 10px;
+  border: 1px solid var(--topic);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--topic) 16%, transparent);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-stretch: 100%;
+  letter-spacing: 0;
+}
+
+/* Topics: a grid of choices, each with a line on what it covers. */
+.topics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
   gap: 8px;
 }
 
 .topic {
   position: relative;
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  min-height: 76px;
+  padding: 12px 12px 12px 14px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.025);
   cursor: pointer;
+  transition:
+    border-color 180ms var(--ease-out),
+    background-color 180ms var(--ease-out);
+}
+
+.topic::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  right: 12px;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--topic);
+  opacity: 0.55;
 }
 
 .topic input {
@@ -106,51 +300,37 @@
   pointer-events: none;
 }
 
-.topic span {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 40px;
-  padding: 0 16px;
-  border: 1px dashed var(--hairline-strong);
-  border-radius: 10px;
-  font-size: 0.875rem;
-  font-weight: 600;
+.topic__label {
+  padding-right: 14px;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.topic__hint {
+  font-size: 0.8125rem;
+  line-height: 1.35;
   color: var(--text-muted);
-  transition:
-    border-color 200ms var(--ease-out),
-    color 200ms var(--ease-out),
-    background-color 200ms var(--ease-out);
 }
 
-.topic span::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  background: var(--topic);
-  opacity: 0.5;
+.topic:hover {
+  border-color: rgb(255 255 255 / 0.28);
+  background: rgb(255 255 255 / 0.045);
 }
 
-.topic:hover span {
-  color: var(--text);
-}
-
-.topic input:checked + span {
-  border-style: solid;
+.topic:has(input:checked) {
   border-color: var(--topic);
-  background: color-mix(in oklch, var(--topic) 14%, transparent);
-  color: var(--text);
+  background: color-mix(in oklab, var(--topic) 14%, rgb(8 10 14));
 }
 
-.topic input:checked + span::before {
+.topic:has(input:checked)::before {
   opacity: 1;
   box-shadow: 0 0 10px var(--topic);
 }
 
-.topic input:focus-visible + span {
+.topic:has(input:focus-visible) {
   outline: 2px solid var(--ice);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 
 .contact-form__honeypot {
@@ -161,67 +341,86 @@
   opacity: 0;
 }
 
+/* Fields: filled, labelled above in full text color. */
 .contact-form__pair {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 22px;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
 .field {
   position: relative;
+  display: grid;
+  gap: 8px;
+}
+
+.field__label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.field__optional {
+  font-weight: 400;
+  color: var(--text-faint);
 }
 
 .field__control {
   display: block;
   width: 100%;
-  padding: 8px 0 12px;
-  border: 0;
-  border-bottom: 1px solid var(--hairline-strong);
-  border-radius: 0;
-  background: transparent;
-  font-size: 1.125rem;
+  height: 52px;
+  padding: 0 16px;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.05);
+  font-size: 1.0625rem;
   color: var(--text);
-  resize: none;
-  transition: border-color 200ms var(--ease-out);
+  transition:
+    border-color 180ms var(--ease-out),
+    background-color 180ms var(--ease-out),
+    box-shadow 180ms var(--ease-out);
+}
+
+.field__control::placeholder {
+  color: var(--text-faint);
 }
 
 .field[data-multiline] .field__control {
-  padding: 12px 14px;
-  border: 1px solid var(--hairline-strong);
-  border-radius: 14px;
-  background: rgb(255 255 255 / 0.02);
-  font-size: 1rem;
+  height: auto;
+  min-height: 200px;
+  padding: 14px 16px 32px;
   line-height: 1.55;
+  resize: vertical;
+}
+
+.field__control:hover {
+  border-color: rgb(255 255 255 / 0.26);
 }
 
 .field__control:focus {
   outline: none;
   border-color: var(--ice);
+  background: rgb(91 210 255 / 0.06);
+  box-shadow: 0 0 0 3px rgb(91 210 255 / 0.18);
 }
 
 .field__hint {
   position: absolute;
-  right: 12px;
+  right: 14px;
   bottom: 10px;
   font-size: 0.6875rem;
   color: var(--text-faint);
-}
-
-.contact-form__send {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px;
 }
 
 .contact-form__submit {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  height: 56px;
-  padding: 0 26px;
+  height: 52px;
+  padding: 0 24px;
   border: 0;
-  border-radius: 16px;
+  border-radius: 14px;
   background: var(--paper);
   font-size: 1.0625rem;
   font-weight: 700;
@@ -248,10 +447,14 @@
 }
 
 .contact-form__status {
-  flex: 1 1 14rem;
-  margin: 0;
+  margin: 14px 0 0;
   font-size: 0.9375rem;
   color: var(--text-muted);
+}
+
+/* Kept in the page (it's a live region) but takes no room until it has something to say. */
+.contact-form__status:empty {
+  margin: 0;
 }
 
 .contact-form__status[data-state="error"] {
@@ -517,82 +720,6 @@
 }
 
 /* ── Elsewhere ── */
-.contact__elsewhere {
-  margin-top: clamp(56px, 7vw, 96px);
-  padding-top: 32px;
-  border-top: 1px solid var(--hairline);
-}
-
-.contact__elsewhere-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px 24px;
-  margin-bottom: 20px;
-}
-
-.contact__elsewhere h2 {
-  margin: 0;
-  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
-  font-weight: 740;
-  font-stretch: 112%;
-  letter-spacing: -0.03em;
-}
-
-.email-line {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-}
-
-.email-line a {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-mono);
-  font-size: 0.9375rem;
-  color: var(--text);
-  text-decoration: none;
-  border-bottom: 1px solid var(--hairline-strong);
-}
-
-.email-line a:hover {
-  border-color: var(--ice);
-}
-
-.email-line button {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--hairline);
-  border-radius: 10px;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-}
-
-.email-line button:hover {
-  color: var(--text);
-  border-color: var(--hairline-strong);
-}
-
-.contact__stamps .social-chip {
-  width: 100%;
-  min-width: 0;
-}
-
-.contact__stamps {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
 @media (max-width: 1000px) {
   .contact__desk {
     grid-template-columns: 1fr;
@@ -600,10 +727,6 @@
 
   .postcard-stage {
     order: -1;
-  }
-
-  .contact__stamps {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -616,6 +739,18 @@
     grid-template-columns: 1fr;
   }
 
+  .topics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .topic {
+    min-height: 0;
+  }
+
+  .contact-stepper .step-connector {
+    margin: 0 8px;
+  }
+
   .postcard {
     grid-template-columns: minmax(0, 1.3fr) 1px minmax(0, 1fr);
     aspect-ratio: 1.35;
@@ -625,8 +760,11 @@
   .postcard__waves {
     display: none;
   }
+}
 
-  .contact__stamps {
-    grid-template-columns: 1fr;
+/* The narrowest phones: only the current step keeps its name. */
+@media (max-width: 400px) {
+  .step-tab:not([data-state="active"]) .step-tab__label {
+    display: none;
   }
 }

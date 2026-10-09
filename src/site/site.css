@@ -33,17 +33,6 @@
   translate: none;
 }
 
-/* React Bits' GlowCursor as a site-wide layer; screen-blended over everything. */
-.glow-cursor.site-glow {
-  position: fixed;
-  inset: 0;
-  z-index: 300;
-  width: auto;
-  height: auto;
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
-
 /* On cream, light can't be added on top: the trail is drawn as color instead. */
 [data-theme="cream"] .glow-cursor.site-glow {
   mix-blend-mode: normal;

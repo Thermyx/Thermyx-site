@@ -14,7 +14,6 @@ import Footer from "./site/Footer.jsx";
 import Header from "./site/Header.jsx";
 import { PAGES, REDIRECTS } from "./site/pages.js";
 import ScrollManager from "./site/ScrollManager.jsx";
-import SiteGlow from "./site/SiteGlow.jsx";
 import { THEMES, usePageTheme } from "./site/theme.js";
 import "./site/site.css";
 
@@ -62,7 +61,6 @@ export default function App() {
       <Footer />
       <GradualBlur target="page" position="top" height="7rem" strength={2} divCount={5} curve="bezier" zIndex={20} />
       <GradualBlur target="page" position="bottom" height="4.5rem" strength={2} divCount={5} curve="bezier" zIndex={20} />
-      <SiteGlow />
     </MotionConfig>
   );
 }

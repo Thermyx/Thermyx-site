@@ -1,201 +1,76 @@
-// The Validation page: test plans, bench and field results, photos, and notes, laid out in a
-// masonry grid. Clicking an entry opens its card with the detail and links. Every entry below is
-// an EXAMPLE (a template showing each kind of tile); replace them as real entries exist.
-// Images are renders of the Prototype 1 CAD and the app from this site.
-//   type     "image" | "text" (a test) | "note" (a quote) | "metric" (one result) | "photo" (a
-//            photo still to come)
-//   tag      one of VALIDATION_TAGS' ids (the pills)
-//   aspect   the tile's height ÷ width
-//   status   "Planned" | "In progress" | "Done" (text and metric tiles)
-//   detail   what the card says: paragraphs, things recorded, and links
-export const VALIDATION_TAGS = [
-  { id: "bench", label: "Bench" },
-  { id: "field", label: "Field" },
-  { id: "firmware", label: "Firmware" },
-  { id: "app", label: "App" },
+// The Validation page: photos and video from building Prototype 1 (a masonry grid; any tile
+// opens larger), then who has recognized Thermyx (a dropdown list).
+//
+// Media lives in public/validation/. Browsers can't all show iPhone HEIC photos or play MOV
+// video, so the site uses web copies made from the originals ("-web.jpg", "-web.mp4").
+//   type     "image" | "video"
+//   src      the web copy
+//   aspect   the tile's height ÷ width (the file's own shape)
+//   title    a caption (shown on hover and in the opened card)
+export const GALLERY = [
+  { id: "demo01", type: "video", src: "/validation/demo01-web.mp4", aspect: 1280 / 720, title: "The app, connected to Prototype 1" },
+  { id: "building01", type: "image", src: "/validation/building01-web.jpg", aspect: 2048 / 1536, title: "Building Prototype 1" },
+  { id: "soldering01", type: "image", src: "/validation/soldering01-web.jpg", aspect: 1024 / 768, title: "Soldering the electronics" },
+  { id: "soldering02", type: "image", src: "/validation/soldering02-web.jpg", aspect: 1024 / 768, title: "Soldering the electronics" },
 ];
 
-const SAFETY = { label: "The limits, on the home page", href: "/#safety" };
-const MODEL = { label: "Explore Prototype 1 in 3D", href: "/#explore" };
-const APP = { label: "The app", href: "/app" };
-const REPO = { label: "The app's code on GitHub", href: "https://github.com/Thermyx/Thermyx" };
-
-export const VALIDATION_ITEMS = [
+// Recognitions, in order. `placeholder: true` rows hold the place until there's another.
+export const RECOGNITIONS = [
   {
-    id: "exploded",
-    type: "image",
-    tag: "bench",
-    title: "Prototype 1, taken apart",
-    img: "/examples/render-exploded.webp",
-    aspect: 0.76,
-    detail: {
-      body: ["The full assembly from the CAD: the insole and its power pack, 20 bodies in all. A photo of the built prototype would sit here."],
-      links: [MODEL],
-    },
+    id: "siteguardian",
+    name: "SiteGuardian",
+    logo: "/validation/siteguardian_logo.jpeg",
+    cover: "/validation/siteguardian_cover.jpeg",
+    tagline: "Plug-and-play monitoring for operations caught in the middle.",
+    people: [["CEO", "Jeffrey Johnston"]],
+    intro:
+      "SiteGuardian is a plug-and-play monitoring platform for operations caught in the middle: too big to wing it, too small for a full supervisory control and data acquisition build-out.",
+    sections: [
+      {
+        title: "How it works",
+        text: "Wireless, battery-powered sensors connect over Wi-Fi and report to one dashboard. Install in minutes: no rewiring, no specialist crews.",
+      },
+      {
+        title: "What it monitors",
+        chips: [
+          "Air temperature & humidity",
+          "Pressure",
+          "Smoke & vape detection, including THC",
+          "Ambient noise levels",
+          "Thermocouple temperature",
+          "Hazardous gas",
+          "Air quality",
+        ],
+      },
+      {
+        title: "Privacy by design",
+        text: "It monitors environments, not people: no conversations, no images or video, no location tracking. Device-level end-to-end encryption comes standard, so data stays safe and teams never feel watched.",
+      },
+      {
+        title: "Who it's built for",
+        text: "Facilities with 3–50 employees, cold storage, warehouses, commercial kitchens, manufacturers, and climate-controlled spaces.",
+      },
+      {
+        title: "The outcomes that matter",
+        list: [
+          "Catch problems before they cause downtime",
+          "Cut energy and maintenance waste you didn't know existed",
+          "Prove compliance when auditors come calling",
+        ],
+      },
+      {
+        title: "Start free",
+        text: "Every purchase comes with three months of the premium service: full access to the online dashboard to remotely manage how a SiteGuardian system behaves. After that it's $5 USD per month, per device, and two free modes of operation keep the basic features with no fees.",
+      },
+    ],
+    motto: "Because oversight should not feel like overwork.",
+    links: [
+      { label: "siteguardian.us", href: "https://www.siteguardian.us/", primary: true },
+      { label: "LinkedIn", href: "https://www.linkedin.com/company/siteguardian/" },
+      { label: "YouTube", href: "https://www.youtube.com/@SiteGuardian-US" },
+      { label: "Email", href: "mailto:support@siteguardian.us" },
+    ],
   },
-  {
-    id: "burn-limit",
-    type: "text",
-    tag: "firmware",
-    title: "Burn-limit check",
-    body: "Warm the foot-contact sensor toward 40 °C and confirm heating stops there, resuming only below 38.5 °C.",
-    status: "Planned",
-    aspect: 0.95,
-    detail: {
-      body: ["The firmware never heats at or above 40 °C foot contact, whatever the app sends. This test would show it holding on the bench."],
-      records: ["Contact temperature at cutoff", "Temperature where heating resumes", "Time from cutoff to output off"],
-      links: [SAFETY],
-    },
-  },
-  {
-    id: "heat-path",
-    type: "image",
-    tag: "bench",
-    title: "The heat path",
-    img: "/examples/render-heat.webp",
-    aspect: 0.875,
-    detail: {
-      body: ["Peltier module, driver, heat sink, and fan, lit in the CAD. Thermal images from the bench would go here."],
-      links: [MODEL],
-    },
-  },
-  {
-    id: "field-note",
-    type: "note",
-    tag: "field",
-    title: "Field note",
-    quote: "Who wore it, where, for how long, and what they noticed. One note per session.",
-    aspect: 0.82,
-    detail: {
-      body: ["Field notes from supervised sessions would go here, each with its date and conditions, and nothing from the wearer that they haven't agreed to share."],
-      links: [],
-    },
-  },
-  {
-    id: "app-safety",
-    type: "image",
-    tag: "app",
-    title: "The Safety tab",
-    img: "/examples/render-app-safety.webp",
-    aspect: 1.44,
-    detail: {
-      body: ["A preview of the app's Safety tab. Screen recordings from testing would replace it."],
-      links: [APP, REPO],
-    },
-  },
-  {
-    id: "ble-range",
-    type: "metric",
-    tag: "app",
-    title: "Bluetooth range",
-    value: "—",
-    caption: "Result pending",
-    status: "Planned",
-    aspect: 0.88,
-    detail: {
-      body: ["How far the phone can be from each insole before the link drops, indoors and out. A metric tile shows one number once there is one, never before."],
-      records: ["Distance at first dropped reading", "Time to reconnect"],
-      links: [APP],
-    },
-  },
-  {
-    id: "field-photo",
-    type: "photo",
-    tag: "field",
-    title: "Field photo",
-    aspect: 1.15,
-    detail: {
-      body: ["A photo from a field session would sit here, with a caption on where and when it was taken."],
-      links: [],
-    },
-  },
-  {
-    id: "watchdog",
-    type: "text",
-    tag: "firmware",
-    title: "Watchdog restart",
-    body: "Hang the control loop on purpose and confirm the chip restarts within 4 seconds with every output off.",
-    status: "Planned",
-    aspect: 0.9,
-    detail: {
-      body: ["The firmware's 4-second watchdog restarts the chip with every output off if the control loop ever hangs."],
-      records: ["Time from hang to restart", "Output state after restart"],
-      links: [SAFETY],
-    },
-  },
-  {
-    id: "sensors",
-    type: "image",
-    tag: "bench",
-    title: "The sensors",
-    img: "/examples/render-sense.webp",
-    aspect: 0.875,
-    detail: {
-      body: ["Three force sensors, the foot-contact temperature sensor, and the motion sensor, lit in the CAD."],
-      links: [MODEL],
-    },
-  },
-  {
-    id: "stale-data",
-    type: "text",
-    tag: "app",
-    title: "Stale-data clearing",
-    body: "Stop an insole's telemetry while it stays connected; after 5 seconds the app should clear its readings.",
-    status: "Planned",
-    aspect: 0.9,
-    detail: {
-      body: ["An insole that stays connected but stops sending for 5 seconds has its readings cleared, so nothing frozen looks live."],
-      records: ["Seconds until the readings clear", "What the screen shows instead"],
-      links: [APP, REPO],
-    },
-  },
-  {
-    id: "power",
-    type: "image",
-    tag: "bench",
-    title: "The power pack",
-    img: "/examples/render-power.webp",
-    aspect: 0.875,
-    detail: {
-      body: ["The external pack: battery in its removable bay, heat sink, and fan."],
-      links: [MODEL],
-    },
-  },
-  {
-    id: "lab-photo",
-    type: "photo",
-    tag: "bench",
-    title: "Bench photo",
-    aspect: 0.9,
-    detail: {
-      body: ["A photo of the bench setup would sit here."],
-      links: [],
-    },
-  },
-  {
-    id: "app-home",
-    type: "image",
-    tag: "app",
-    title: "The Home tab",
-    img: "/examples/render-app-home.webp",
-    aspect: 1.44,
-    detail: {
-      body: ["A preview of the app's Home tab: both soles side by side, with skeletons where live readings go."],
-      links: [APP],
-    },
-  },
-  {
-    id: "cooling-floor",
-    type: "text",
-    tag: "firmware",
-    title: "Cooling floor",
-    body: "Cool the foot-contact sensor toward 15 °C and confirm cooling stops there.",
-    status: "Planned",
-    aspect: 0.8,
-    detail: {
-      body: ["The firmware never cools at or below 15 °C foot contact."],
-      records: ["Contact temperature at cutoff"],
-      links: [SAFETY],
-    },
-  },
+  { id: "placeholder-1", placeholder: true, name: "Placeholder", tagline: "Another recognition will go here." },
+  { id: "placeholder-2", placeholder: true, name: "Placeholder", tagline: "Another recognition will go here." },
 ];

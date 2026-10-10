@@ -1,53 +1,42 @@
-import { ArrowUpRight, Camera, FlaskConical, Maximize2, Quote } from "lucide-react";
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { ArrowUpRight, ChevronDown, Maximize2, Play } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useId, useState } from "react";
 import Masonry from "../../components/Masonry.jsx";
-import { VALIDATION_ITEMS, VALIDATION_TAGS } from "../../data/validation.js";
+import SpotlightCard from "../../components/SpotlightCard.jsx";
+import StarBorder from "../../components/StarBorder.jsx";
+import { GALLERY, RECOGNITIONS } from "../../data/validation.js";
 import { useDocumentTitle } from "../../lib/useDocumentTitle.js";
 import { useReducedMotion } from "../../lib/useReducedMotion.js";
 import FloatingCardLayer from "../../ui/FloatingCards.jsx";
 import { useFloatingCards } from "../../ui/floatingCards.js";
 import PageHero from "../../ui/PageHero.jsx";
-import Pills from "../../ui/Pills.jsx";
 import "./validation.css";
 
-const TAG_LABEL = Object.fromEntries(VALIDATION_TAGS.map(({ id, label }) => [id, label]));
+const ITEMS = GALLERY.map((item) => ({ ...item, label: `${item.title}: open larger` }));
+const COLUMNS = [3, 3, 2, 2];
+const EASE = [0.22, 1, 0.36, 1];
 
-// Validation: React Bits' Masonry (patched to hold any kind of tile) of test plans, results,
-// photos, and notes. A tile opens a draggable card with the detail and links.
+// Validation: photos and video from building Prototype 1 in React Bits' Masonry (videos play,
+// muted and looping, in their tiles; any tile opens larger in a draggable card), then who has
+// recognized Thermyx, as a dropdown list of React Bits SpotlightCards.
 export default function ValidationPage() {
   useDocumentTitle("Validation");
   const reducedMotion = useReducedMotion();
-  const [tag, setTag] = useState("all");
-  const items = useMemo(
-    () => VALIDATION_ITEMS.filter((item) => tag === "all" || item.tag === tag).map((item) => ({ ...item, label: `${item.title}: open details` })),
-    [tag],
-  );
-  const options = [
-    { id: "all", label: "All", count: VALIDATION_ITEMS.length },
-    ...VALIDATION_TAGS.map(({ id, label }) => ({ id, label, count: VALIDATION_ITEMS.filter((item) => item.tag === id).length })),
-  ];
 
   return (
     <div className="page-shell validation">
-      <PageHero
-        label="Validation"
-        title="Tested, in the open."
-        lede="Prototype 1 is in supervised field evaluation. Its test plans, bench results, and field notes will live here as they're ready; for now, every tile is an example of what's coming."
-      />
-      <div className="validation__bar">
-        <Pills label="Show" options={options} value={tag} onChange={setTag} />
-        <p className="validation__hint">
-          <Maximize2 size={14} aria-hidden="true" />
-          Open any tile for the detail
-        </p>
-      </div>
+      <PageHero label="Validation" title="Built by hand." lede="Photos and video from building Prototype 1. Open any of them to see it larger." />
+
+      <p className="validation__hint">
+        <Maximize2 size={14} aria-hidden="true" />
+        Open any tile for a closer look
+      </p>
       <Masonry
-        items={items}
-        renderItem={renderTile}
+        items={ITEMS}
+        renderItem={(item) => <Tile item={item} reducedMotion={reducedMotion} />}
         onItemClick={(item, element) => useFloatingCards.getState().open(item, element)}
         animateFrom="bottom"
-        stagger={0.04}
+        stagger={0.06}
         scaleOnHover
         hoverScale={0.97}
         blurToFocus
@@ -55,136 +44,194 @@ export default function ValidationPage() {
         columnCounts={COLUMNS}
         className="validation__grid"
       />
-      <FloatingCardLayer render={renderDetail} />
+      <FloatingCardLayer render={(item, titleId) => <Detail item={item} titleId={titleId} reducedMotion={reducedMotion} />} />
+
+      <Recognized />
     </div>
   );
 }
 
-const COLUMNS = [4, 4, 3, 2];
+// ── The gallery ──
 
-// ── Tiles: one look per type ──
-
-function renderTile(item) {
-  const Tile = TILES[item.type];
-  return <Tile item={item} />;
+function Media({ item, reducedMotion, className }) {
+  if (item.type === "video") {
+    return (
+      <video
+        className={className}
+        src={item.src}
+        muted
+        loop
+        playsInline
+        autoPlay={!reducedMotion}
+        preload="metadata"
+        aria-hidden="true"
+      />
+    );
+  }
+  return <img className={className} src={item.src} alt="" loading="lazy" decoding="async" draggable="false" />;
 }
 
-function TileMeta({ item }) {
+function Tile({ item, reducedMotion }) {
   return (
-    <span className="v-tile__meta">
-      <span className="v-tile__tag">{TAG_LABEL[item.tag]}</span>
-      <span className="example-tag">Example</span>
-    </span>
-  );
-}
-
-const TILES = {
-  image: ({ item }) => (
-    <div className="v-tile v-tile--image">
-      <img src={item.img} alt="" loading="lazy" decoding="async" draggable="false" />
-      <div className="v-tile__shade">
-        <TileMeta item={item} />
-        <p className="v-tile__title">{item.title}</p>
+    <div className="g-tile">
+      <Media item={item} reducedMotion={reducedMotion} className="g-tile__media" />
+      <div className="g-tile__shade">
+        {item.type === "video" && (
+          <span className="g-tile__badge">
+            <Play size={11} fill="currentColor" aria-hidden="true" />
+            Video
+          </span>
+        )}
+        <p className="g-tile__title">{item.title}</p>
       </div>
     </div>
-  ),
-  text: ({ item }) => (
-    <div className="v-tile v-tile--text">
-      <TileMeta item={item} />
-      <FlaskConical className="v-tile__icon" size={20} aria-hidden="true" />
-      <p className="v-tile__title">{item.title}</p>
-      <p className="v-tile__body">{item.body}</p>
-      <Status value={item.status} />
-    </div>
-  ),
-  note: ({ item }) => (
-    <div className="v-tile v-tile--note">
-      <TileMeta item={item} />
-      <Quote className="v-tile__quote-mark" size={28} aria-hidden="true" />
-      <p className="v-tile__quote">{item.quote}</p>
-      <p className="v-tile__title v-tile__title--small">{item.title}</p>
-    </div>
-  ),
-  metric: ({ item }) => (
-    <div className="v-tile v-tile--metric">
-      <TileMeta item={item} />
-      <p className="v-tile__value">{item.value}</p>
-      <p className="v-tile__caption">{item.caption}</p>
-      <p className="v-tile__title v-tile__title--small">{item.title}</p>
-    </div>
-  ),
-  photo: ({ item }) => (
-    <div className="v-tile v-tile--photo">
-      <TileMeta item={item} />
-      <div className="v-tile__placeholder">
-        <Camera size={28} aria-hidden="true" />
-        <span>Photo coming</span>
-      </div>
-      <p className="v-tile__title v-tile__title--small">{item.title}</p>
-    </div>
-  ),
-};
-
-function Status({ value }) {
-  if (!value) return null;
-  return (
-    <span className="v-status" data-status={value.toLowerCase().replace(/\s+/g, "-")}>
-      <span className="v-status__dot" aria-hidden="true" />
-      {value}
-    </span>
   );
 }
 
-// ── The card a tile opens ──
-
-function renderDetail(item, titleId) {
-  const { body = [], records = [], links = [] } = item.detail ?? {};
+function Detail({ item, titleId, reducedMotion }) {
   return (
-    <div className="v-detail">
-      {item.img && <img className="v-detail__img" src={item.img} alt="" />}
-      <p className="v-detail__meta">
-        <span className="v-tile__tag">{TAG_LABEL[item.tag]}</span>
-        <Status value={item.status} />
-        <span className="example-tag">Example</span>
-      </p>
-      <h2 id={titleId} className="v-detail__title">
+    <figure className="g-detail">
+      {item.type === "video" ? (
+        <video className="g-detail__media" src={item.src} muted loop playsInline autoPlay={!reducedMotion} controls />
+      ) : (
+        <img className="g-detail__media" src={item.src} alt={item.title} />
+      )}
+      <figcaption id={titleId} className="g-detail__caption">
         {item.title}
+      </figcaption>
+    </figure>
+  );
+}
+
+// ── Recognized by ──
+
+function Recognized() {
+  const [open, setOpen] = useState(null); // all closed until one is picked
+  return (
+    <section className="recognized" aria-labelledby="recognized-title">
+      <h2 id="recognized-title" className="recognized__title">
+        Recognized by<span>.</span>
       </h2>
-      {body.map((paragraph) => (
-        <p key={paragraph} className="v-detail__text">
-          {paragraph}
-        </p>
-      ))}
-      {records.length > 0 && (
-        <>
-          <p className="eyebrow v-detail__label">What gets recorded</p>
-          <ul className="v-detail__records">
-            {records.map((record) => (
-              <li key={record}>{record}</li>
-            ))}
-          </ul>
-        </>
-      )}
-      {links.length > 0 && (
-        <ul className="v-detail__links">
-          {links.map(({ label, href }) => (
-            <li key={href}>
-              {href.startsWith("http") ? (
-                <a href={href} target="_blank" rel="noreferrer noopener">
-                  {label}
-                  <ArrowUpRight size={15} aria-hidden="true" />
-                  <span className="visually-hidden"> (opens in a new tab)</span>
-                </a>
-              ) : (
-                <Link to={href}>
-                  {label}
-                  <ArrowUpRight size={15} aria-hidden="true" />
-                </Link>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+      <ul className="recognized__list">
+        {RECOGNITIONS.map((entry) => (
+          <li key={entry.id}>
+            <Recognition entry={entry} open={open === entry.id} onToggle={() => setOpen(open === entry.id ? null : entry.id)} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function Recognition({ entry, open, onToggle }) {
+  const panelId = useId();
+  if (entry.placeholder) {
+    return (
+      <div className="recognition recognition--placeholder">
+        <div className="recognition__head">
+          <span className="recognition__logo recognition__logo--empty" aria-hidden="true" />
+          <span className="recognition__names">
+            <span className="recognition__name">{entry.name}</span>
+            <span className="recognition__tagline">{entry.tagline}</span>
+          </span>
+          <span className="recognition__soon">Coming soon</span>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <SpotlightCard className="recognition" spotlightColor="rgb(91 210 255 / 0.14)">
+      <button type="button" className="recognition__head" aria-expanded={open} aria-controls={panelId} onClick={onToggle}>
+        <img className="recognition__logo" src={entry.logo} alt="" />
+        <span className="recognition__names">
+          <span className="recognition__name">{entry.name}</span>
+          <span className="recognition__tagline">{entry.tagline}</span>
+        </span>
+        <ChevronDown className="recognition__chevron" size={22} aria-hidden="true" />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            id={panelId}
+            className="recognition__panel"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.45, ease: EASE }}
+          >
+            <div className="recognition__body">
+              <img className="recognition__cover" src={entry.cover} alt={`${entry.name} banner`} />
+              <div className="recognition__intro">
+                <p>{entry.intro}</p>
+                <dl className="recognition__people">
+                  {entry.people.map(([role, name]) => (
+                    <div key={role}>
+                      <dt>{role}</dt>
+                      <dd>{name}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+              <div className="recognition__sections">
+                {entry.sections.map((section) => (
+                  <div key={section.title} className="recognition__section">
+                    <h3>{section.title}</h3>
+                    {section.text && <p>{section.text}</p>}
+                    {section.chips && (
+                      <ul className="recognition__chips">
+                        {section.chips.map((chip) => (
+                          <li key={chip}>{chip}</li>
+                        ))}
+                      </ul>
+                    )}
+                    {section.list && (
+                      <ul className="recognition__points">
+                        {section.list.map((point) => (
+                          <li key={point}>{point}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <p className="recognition__motto">{entry.motto}</p>
+              <div className="recognition__links">
+                {entry.links.map(({ label, href, primary }) =>
+                  primary ? (
+                    <StarBorder
+                      key={href}
+                      as="a"
+                      href={href}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="recognition__visit"
+                      color="#5bd2ff"
+                      speed="5s"
+                      backgroundColor="#0b1626"
+                      borderColor="rgb(91 210 255 / 0.35)"
+                      textColor="#f1f4f8"
+                    >
+                      {label}
+                      <ArrowUpRight size={16} aria-hidden="true" />
+                    </StarBorder>
+                  ) : (
+                    <a
+                      key={href}
+                      className="recognition__link"
+                      href={href}
+                      target={href.startsWith("http") ? "_blank" : undefined}
+                      rel={href.startsWith("http") ? "noreferrer noopener" : undefined}
+                    >
+                      {label}
+                      <ArrowUpRight size={15} aria-hidden="true" />
+                    </a>
+                  ),
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </SpotlightCard>
   );
 }

@@ -10,6 +10,7 @@ import MediaPage from "./pages/media/MediaPage.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import PlaceholderPage from "./pages/PlaceholderPage.jsx";
 import TeamPage from "./pages/team/TeamPage.jsx";
+import ValidationPage from "./pages/validation/ValidationPage.jsx";
 import Footer from "./site/Footer.jsx";
 import Header from "./site/Header.jsx";
 import { PAGES, REDIRECTS } from "./site/pages.js";
@@ -17,12 +18,11 @@ import ScrollManager from "./site/ScrollManager.jsx";
 import { THEMES, usePageTheme } from "./site/theme.js";
 import "./site/site.css";
 
-// Pages with content of their own; the rest are placeholders until theirs arrives. (A masonry
-// Validation page is built in src/pages/validation/ but not routed yet: add
-// "/validation": <ValidationPage /> here to bring it back.)
+// Pages with content of their own; the rest are placeholders until theirs arrives.
 const PAGE_ELEMENTS = {
   "/app": <AppPage />,
   "/team": <TeamPage />,
+  "/validation": <ValidationPage />,
   "/media": <MediaPage />,
   "/contact": <ContactPage />,
 };

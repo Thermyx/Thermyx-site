@@ -1,10 +1,11 @@
-import { Activity, ArrowUpRight, Check, FlameKindling, FlaskConical, HeartPulse, ListChecks, Smartphone, UserRoundCheck } from "lucide-react";
+import { Activity, ArrowUpRight, Check, FlameKindling, HeartPulse, ListChecks, Minus, Plus, Sparkles, Smartphone, UserRoundCheck } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AnimatedContent from "../components/AnimatedContent.jsx";
 import CircularText from "../components/CircularText.jsx";
 import SpotlightCard from "../components/SpotlightCard.jsx";
+import { ARCH_SITE, FOOT_HEIGHT, FOOT_WIDTH, footPath, footPoint } from "../data/foot.js";
 import { useReducedMotion } from "../lib/useReducedMotion.js";
 import { WAITLIST_HREF } from "../site/pages.js";
 import WordRise from "../ui/WordRise.jsx";
@@ -25,8 +26,8 @@ export function ControlSection() {
           index="01"
           label="The control bar"
           titleId="control-title"
-          title={["Cool, Auto, Heat.", "One tap away."]}
-          lede="The thermal control bar sits right above the tabs, so changing what your feet feel never takes more than a tap."
+          title={["Auto, Cool, Heat, Off.", "One button."]}
+          lede="The thermal control sits right above the tabs: one button that steps through the settings, and a stepper for Auto's target beside it."
         />
         <div className="control-grid">
           <ControlBarDemo />
@@ -52,16 +53,23 @@ export function ControlSection() {
   );
 }
 
-// The bar as the app draws it. It steps through the modes on its own until you pick one.
+// The control as the app draws it: one button that steps through the settings, and the Auto
+// target's stepper beside it. It steps on its own until you tap it; the list under it is the
+// press-and-hold menu, laid open.
+const TARGET = { min: 26, max: 38, start: 32 };
+
 function ControlBarDemo() {
   const reducedMotion = useReducedMotion();
-  const [state, setState] = useState({ index: 1, held: false });
+  const [state, setState] = useState({ index: 0, held: false });
+  const [target, setTarget] = useState(TARGET.start);
   useEffect(() => {
     if (reducedMotion || state.held) return;
     const timer = setInterval(() => setState((s) => ({ ...s, index: (s.index + 1) % MODES.length })), 2800);
     return () => clearInterval(timer);
   }, [reducedMotion, state.held]);
   const mode = MODES[state.index];
+  const pick = (index) => setState({ index, held: true });
+  const nudge = (by) => setTarget((t) => Math.min(TARGET.max, Math.max(TARGET.min, t + by)));
 
   return (
     <div className="control-demo" data-tone={mode.tone}>
@@ -80,23 +88,34 @@ function ControlBarDemo() {
           </motion.span>
         </AnimatePresence>
       </p>
-      <div className="control-bar-app" role="group" aria-label="Thermal mode (a demo of the app's control bar)">
-        {MODES.map((m, i) => (
-          <button
-            key={m.name}
-            type="button"
-            className="control-bar-app__segment"
-            aria-pressed={i === state.index}
-            data-tone={m.tone}
-            onClick={() => setState({ index: i, held: true })}
-          >
-            {i === state.index && (
-              <motion.span layoutId="control-bar-app-thumb" className="control-bar-app__thumb" transition={{ type: "spring", stiffness: 460, damping: 36 }} />
-            )}
-            <span className="control-bar-app__label">{m.name}</span>
+      <div className="control-bar-app" role="group" aria-label="Thermal control (a demo of the app's)">
+        <button type="button" className="control-bar-app__mode" onClick={() => pick((state.index + 1) % MODES.length)}>
+          <span className="control-bar-app__dot" aria-hidden="true" />
+          <span className="control-bar-app__label">{mode.name}</span>
+          <span className="control-bar-app__hint">Tap to step</span>
+        </button>
+        <div className="control-bar-app__stepper" role="group" aria-label={`Auto target, ${target} °C`}>
+          <button type="button" onClick={() => nudge(-1)} disabled={target <= TARGET.min} aria-label="Lower the Auto target">
+            <Minus size={16} strokeWidth={2.4} aria-hidden="true" />
           </button>
-        ))}
+          <span className="control-bar-app__target mono">
+            {target}
+            <small>°C</small>
+          </span>
+          <button type="button" onClick={() => nudge(1)} disabled={target >= TARGET.max} aria-label="Raise the Auto target">
+            <Plus size={16} strokeWidth={2.4} aria-hidden="true" />
+          </button>
+        </div>
       </div>
+      <ol className="control-steps" aria-label="Settings, in the order a tap steps through them">
+        {MODES.map((m, i) => (
+          <li key={m.name}>
+            <button type="button" className="control-steps__step" data-tone={m.tone} aria-pressed={i === state.index} onClick={() => pick(i)}>
+              {m.name}
+            </button>
+          </li>
+        ))}
+      </ol>
       <p className="control-demo__body" aria-live="polite">
         {mode.body}
       </p>
@@ -134,8 +153,8 @@ export function PairSection() {
                 Your feet, compared with <em>each other.</em>
               </h3>
               <p className="app-tile__text">
-                A gap that holds for two minutes raises a caution on its own. Shorter ones are ordinary walking noise, and are
-                ignored. No chart averages the two feet into one line.
+                Heavy leaning or a limp raises a caution on its own once it holds for 3 of the last 5 minutes, judged against
+                your own usual. Ordinary walking never trips it. No chart averages the two feet into one line.
               </p>
             </div>
             <ul className="pair-gaps__list">
@@ -158,33 +177,38 @@ export function PairSection() {
   );
 }
 
-const SOLE =
-  "M50 256C31 256 22 241 22 216C22 188 18 160 14 128C10 98 7 74 10 52C14 24 34 4 60 4C82 4 95 22 94 48C93 74 84 96 78 118C72 140 71 162 75 186C79 210 75 256 50 256Z";
+// The three pairing states as the app lays them out, on the app's own foot outlines (no readings:
+// only the one arch sensor is marked).
+const SOLE_H = 236;
+const SOLE_W = (FOOT_WIDTH * SOLE_H) / FOOT_HEIGHT;
 
-// The three pairing states as the app lays them out (no readings: zones are just marked).
 function PairDiagram({ state }) {
-  const sole = (x, mirrored, kind) => (
-    <g transform={`translate(${x} 18) ${mirrored ? "translate(100 0) scale(-1 1)" : ""}`}>
-      <path d={SOLE} className={`pair-diagram__sole pair-diagram__sole--${kind}`} />
-      {kind === "live" &&
-        [
-          [60, 64],
-          [37, 148],
-          [49, 218],
-        ].map(([cx, cy], i) => <circle key={i} cx={cx} cy={cy} r="9" className={`pair-diagram__zone pair-diagram__zone--${i === 2 ? "hot" : "cool"}`} />)}
-    </g>
-  );
+  const sole = (foot, x, kind) => {
+    const at = { x, y: 32, height: SOLE_H };
+    const [ax, ay] = footPoint(foot, ARCH_SITE, at);
+    return (
+      <g key={foot}>
+        <path d={footPath(foot, at)} className={`pair-diagram__sole pair-diagram__sole--${kind}`} />
+        {kind === "live" && (
+          <>
+            <circle cx={ax} cy={ay} r="13" className="pair-diagram__halo" />
+            <circle cx={ax} cy={ay} r="6" className="pair-diagram__zone pair-diagram__zone--cool" />
+          </>
+        )}
+      </g>
+    );
+  };
   return (
     <svg className="pair-diagram" viewBox="0 0 320 300" aria-hidden="true">
       {state === "both" && (
         <>
-          {sole(48, false, "live")}
-          {sole(172, true, "live")}
+          {sole("left", 160 - 14 - SOLE_W, "live")}
+          {sole("right", 160 + 14, "live")}
         </>
       )}
       {state === "one" && (
         <>
-          {sole(110, false, "live")}
+          {sole("left", 160 - SOLE_W / 2, "live")}
           <rect x="268" y="110" width="44" height="74" rx="14" className="pair-diagram__tab" />
           <text x="290" y="142" className="pair-diagram__tab-label" textAnchor="middle">
             R
@@ -194,8 +218,8 @@ function PairDiagram({ state }) {
       )}
       {state === "none" && (
         <>
-          {sole(48, false, "empty")}
-          {sole(172, true, "empty")}
+          {sole("left", 160 - 14 - SOLE_W, "empty")}
+          {sole("right", 160 + 14, "empty")}
           <rect x="40" y="124" width="240" height="48" rx="24" className="pair-diagram__prompt" />
           <text x="160" y="154" className="pair-diagram__prompt-label" textAnchor="middle">
             No insoles connected
@@ -291,7 +315,7 @@ const TRUST_ICONS = {
   list: ListChecks,
   health: HeartPulse,
   baseline: Activity,
-  demo: FlaskConical,
+  ai: Sparkles,
 };
 
 export function TrustSection() {

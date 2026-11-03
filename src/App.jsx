@@ -6,6 +6,7 @@ import GradualBlur from "./components/GradualBlur.jsx";
 import SceneCanvas from "./explorer/SceneCanvas.jsx";
 import Home from "./home/Home.jsx";
 import ContactPage from "./pages/contact/ContactPage.jsx";
+import ArticlePage from "./pages/media/ArticlePage.jsx";
 import MediaPage from "./pages/media/MediaPage.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import PlaceholderPage from "./pages/PlaceholderPage.jsx";
@@ -52,6 +53,7 @@ export default function App() {
           {PAGES.map(({ path, label }) => (
             <Route key={path} path={path} element={PAGE_ELEMENTS[path] ?? <PlaceholderPage title={label} />} />
           ))}
+          <Route path="/media/learn/:id" element={<ArticlePage />} />
           {REDIRECTS.map(({ from, to }) => (
             <Route key={from} path={from} element={<Navigate to={to} replace />} />
           ))}

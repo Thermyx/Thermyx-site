@@ -1,7 +1,8 @@
 // Copy for the app page. Facts only, from the app repo (~/VSProjects/Thermyx, github.com/Thermyx/Thermyx):
 // README.md, ThermyxApp/Models/ThermyxRisk.swift (levels, ladder, heat lockout),
-// ThermyxApp/Views (tab names, screen labels, onboarding), project.yml (iOS 17), and the firmware
-// (Auto target 26 to 38 °C, 40 °C burn limit).
+// ThermyxApp/Views (tab names, screen labels, onboarding), ThermalControlBar.swift (one button,
+// Auto → Cool → Heat → Off), project.yml (iOS 17), and the firmware (Auto target 26 to 38 °C,
+// 40 °C burn limit).
 
 // The page's opening facts.
 export const HERO_FACTS = [
@@ -17,8 +18,8 @@ export const TOUR = [
     screen: "home",
     tab: "Home",
     title: ["Both feet,", "side by side."],
-    body: "Each insole gets its own sole on screen, inner edges facing, with its own zone readouts and its own history. One connected and one not is a normal state: the missing foot shrinks to a tab at the edge, one tap from pairing.",
-    chips: ["Ambient", "Forefoot load", "L–R gap", "Steadiness"],
+    body: "Each insole gets its own sole on screen, inner edges facing, with its own readouts and its own history, and Pressure, Temperature, and Gait maps. One connected and one not is a normal state: the missing foot shrinks to a tab at the edge, one tap from pairing.",
+    chips: ["Air outside", "Steps today", "Weight", "Steps a minute"],
     note: "No value from one foot is ever shown for the other.",
   },
   {
@@ -26,9 +27,18 @@ export const TOUR = [
     screen: "insights",
     tab: "Insights",
     title: ["History that", "waits for data."],
-    body: "Readings fold into minute buckets kept for 7 days and hour buckets kept for 180. A chart needs at least three before it draws anything, so a trend is never a line through two points. Temperature, movement, and balance each get a closer look, with steps and workouts from Apple Health alongside if you turn it on.",
-    chips: ["Day · Week · Month", "Temperature", "Movement", "Balance", "Learning center"],
+    body: "Readings fold into minute buckets kept for 7 days and hour buckets kept for 180. A chart needs at least three before it draws anything, so a trend is never a line through two points. Temperature, movement, and balance each get a closer look, with daily summaries, a weekly report, and your feet played back over the day.",
+    chips: ["Day · Week · Month", "Temperature", "Movement", "Balance", "Daily summaries"],
     note: "Below three buckets, the chart shows an empty state instead.",
+  },
+  {
+    id: "learn",
+    screen: "learn",
+    tab: "Learn",
+    title: ["Short reads,", "with sources."],
+    body: "Eight articles on heat, cold, and your feet, written for anyone and referenced in APA 7. The app picks the one that fits what's happening now, and the reader offers text size, high-contrast themes, and read-aloud.",
+    chips: ["8 articles", "For right now", "Read-aloud", "AI Insights, opt-in"],
+    note: "Educational, not a medical diagnosis tool.",
   },
   {
     id: "safety",
@@ -36,7 +46,7 @@ export const TOUR = [
     tab: "Safety",
     title: ["Four levels,", "each one explained."],
     body: "Normal, Caution, High risk, Critical. Every level from Caution up says why: each signal with its value and rule, which foot, how old the data is, a confidence rating, and the next step. From High risk up, heating is locked out.",
-    chips: ["Escalation ladder", "SOS", "Trusted circle", "Advanced"],
+    chips: ["Escalation ladder", "SOS", "Ask for help", "Trusted circle"],
     note: "Critical opens a full-screen alert with Call 911 and I'm OK.",
   },
   {
@@ -44,23 +54,26 @@ export const TOUR = [
     screen: "watch",
     tab: "For watchers",
     title: ["For the people", "watching out."],
-    body: "Choose “I'm watching someone” and the app becomes Watch, Insights, and Settings: the wearer's current level, how fresh it is, and a way to call. A heartbeat every minute means a quiet phone shows as “No update for N min”, never as all clear.",
+    body: "Choose “I'm watching someone” and the app becomes Watch, Insights, and Settings: the wearer's current level, how fresh it is, and a way to call. A heartbeat every minute means a quiet phone shows as “No update for N min”, never as all clear. An opt-in sample shift teaches the screens before a real alert.",
     chips: ["Watch", "Insights", "Settings"],
     note: "Watchers can see and call. They can't control someone else's insoles.",
   },
 ];
 
-// The thermal control bar's modes.
+// The thermal control's settings, in the order a tap steps through them.
 export const MODES = [
+  { name: "Auto", tone: "auto", body: "Holds the target on the stepper beside it, anywhere from 26 to 38 °C." },
   { name: "Cool", tone: "cool", body: "The Peltier pulls heat away from your foot, and the fan and heat sink in the power pack carry it off." },
-  { name: "Auto", tone: "auto", body: "Holds the target you set, anywhere from 26 to 38 °C." },
   { name: "Heat", tone: "hot", body: "Warms your foot, and stops at 40 °C foot contact whatever you ask for." },
+  { name: "Off", tone: "off", body: "The Peltier and fan stop. The insoles keep sensing and reporting." },
 ];
 
 export const CONTROL_FACTS = [
-  "Above Home, Insights, Safety, and Advanced. Screens with charts drop it, so the charts get the height.",
+  "On every wearer screen, between the content and the tab bar, pushed screens included.",
+  "Tap to step, hold for the list. Taps reach the insoles only once you stop tapping, so stepping past Heat never sends heat.",
   "Heating is locked out from High risk up. A heat-strained wearer can't command more heat.",
-  "Watchers get no control bar at all.",
+  "The status line reports what the insoles say back, not what was asked.",
+  "Watchers get no control at all.",
 ];
 
 // The pair, as the app draws it (README, "Thermyx is a pair").
@@ -68,7 +81,7 @@ export const PAIR_STATES = [
   {
     id: "both",
     title: "Both connected",
-    body: "Equal soles side by side, inner edges facing, each with its own zone readouts and its own history.",
+    body: "Equal soles side by side, inner edges facing, each with its own readouts and its own history.",
   },
   {
     id: "one",
@@ -83,9 +96,9 @@ export const PAIR_STATES = [
 ];
 
 export const PAIR_GAPS = [
-  ["Temperature gap", "How far apart your feet run, over time."],
-  ["Load gap", "Forefoot share, in percentage points."],
-  ["Gait-stability gap", "Whether one foot's steps are less steady."],
+  ["Temperature gap", "How far apart your feet run, and which one runs warmer."],
+  ["Arch load gap", "How much harder one arch presses down. There is one pressure sensor, under the arch."],
+  ["Steadiness gap", "Whether one foot's steps are less steady. A limp shows as a gap that holds."],
 ];
 
 // The escalation ladder (ThermyxRisk.swift): each level's name and tint, what the app does at it
@@ -100,8 +113,8 @@ export const LADDER = [
 // What "Why am I seeing this?" shows for every level from Caution up (README).
 export const EXPLAIN = ["Each signal, with its value and rule", "Which foot", "How old the data is", "A confidence rating", "The next step"];
 
-// Privacy, people, and trying it out (README: safety behaviour, relay access model, Apple Health,
-// simulated insoles).
+// Privacy and people (README: safety behaviour, relay access model, accounts, Apple Health,
+// AI Insights).
 export const TRUST = [
   {
     icon: "users",
@@ -111,7 +124,7 @@ export const TRUST = [
   {
     icon: "phone",
     title: "Readings stay on the phone",
-    body: "The shared relay receives escalated risk events only. Location goes with your consent, only during a High, Critical, or SOS event, and expires after an hour.",
+    body: "You sign in with Google, and the account holds no readings. The relay receives escalated risk events only. Location goes only during a High, Critical, or SOS event, and expires after an hour.",
   },
   {
     icon: "list",
@@ -129,8 +142,8 @@ export const TRUST = [
     body: "Calibrates over 10 calm minutes, then learns slowly. It can add Caution, but never lowers a level the fixed rules set, and never goes past Caution on its own.",
   },
   {
-    icon: "demo",
-    title: "Demo Mode",
-    body: "Try the whole app without an insole: a simulated pair you can cool, heat, and walk up the risk ladder. Every screen says “Simulated — not live sensor data”, and nothing is saved or sent.",
+    icon: "ai",
+    title: "AI Insights, only if you turn it on",
+    body: "Off by default. A day's summary and next steps, written by Anthropic's Claude through the relay. Only that day's totals and averages are sent, never live readings, your name, or where you are.",
   },
 ];

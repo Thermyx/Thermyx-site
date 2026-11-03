@@ -1,11 +1,13 @@
 import CountUp from "../components/CountUp.jsx";
 import SpotlightCard from "../components/SpotlightCard.jsx";
+import { ARCH_SITE, FOOT_HEIGHT, FOOT_WIDTH, footPath, footPoint } from "../data/foot.js";
 import SectionHead from "../ui/SectionHead.jsx";
 
-// Source: the app README, "Thermyx is a pair" and "What the pair makes possible".
+// Source: the app README, "Thermyx is a pair" and "What the pair makes possible", and
+// Models/ML/AsymmetryMonitor.swift (3 of the last 5 minutes, against the wearer's own usual).
 const GAPS = [
   { title: "Temperature gap", body: "How far apart your feet run, over time." },
-  { title: "Load gap", body: "How much more of your weight one forefoot carries than the other." },
+  { title: "Arch load gap", body: "How much harder one arch presses down than the other. There is one pressure sensor, under the arch." },
   { title: "Gait-stability gap", body: "Whether one foot's steps are less steady than the other's." },
 ];
 
@@ -53,14 +55,16 @@ export default function Pair() {
           <SpotlightCard className="tile tile--hold" spotlightColor="rgb(255 106 19 / 0.14)">
             <p className="tile__kicker eyebrow">Sustained, not momentary</p>
             <p className="tile__big">
-              <span className="visually-hidden">2 minutes</span>
+              <span className="visually-hidden">3 of the last 5 minutes</span>
               <span aria-hidden="true">
-                <CountUp to={2} duration={1.2} className="tile__big-number" />
-                <span className="tile__big-unit">min</span>
+                <CountUp to={3} duration={1.2} className="tile__big-number" />
+                <span className="tile__big-unit">of 5 min</span>
               </span>
             </p>
             <p className="tile__text">
-              A gap that holds for two minutes raises a caution. Shorter ones are ordinary walking noise, and are ignored.
+              Heavy leaning or a limp raises a caution only once it holds for 3 of the last 5 minutes, judged against your own
+              usual. Ordinary walking, where weight swaps feet every step, never trips it, and it never goes past Caution on
+              its own.
             </p>
           </SpotlightCard>
 
@@ -78,59 +82,58 @@ export default function Pair() {
   );
 }
 
-// A left and a right sole, medial edges facing as the app draws them, with the three force
-// sensors under each (heel, arch, forefoot) and the comparisons running between them. A diagram,
-// not data: there are no readings in it.
-const SOLE = "M50 256C31 256 22 241 22 216C22 188 18 160 14 128C10 98 7 74 10 52C14 24 34 4 60 4C82 4 95 22 94 48C93 74 84 96 78 118C72 140 71 162 75 186C79 210 75 256 50 256Z";
-// Sensor positions on the left sole, and where its inner (medial) edge is at that height.
-const ZONES = [
-  { name: "Forefoot", x: 62, y: 66, edge: 93 },
-  { name: "Arch", x: 36, y: 150, edge: 73 },
-  { name: "Heel", x: 49, y: 222, edge: 78 },
+// A left and a right foot, the app's own outlines with medial edges facing, each with the one arch
+// pressure sensor the app reads and the comparison running between them. Faint inner contours
+// echo the app's foot maps. A diagram, not data: there are no readings in it.
+const H = 236;
+const FEET = [
+  { foot: "left", x: 22, label: "L" },
+  { foot: "right", x: 238 - (FOOT_WIDTH * H) / FOOT_HEIGHT, label: "R" },
 ];
+const CONTOURS = [0.78, 0.56, 0.34];
 
 function SoleDiagram() {
+  const arches = FEET.map(({ foot, x }) => footPoint(foot, ARCH_SITE, { x, y: 12, height: H }));
+  const [[ax1, ay], [ax2]] = arches;
   return (
-    <figure className="soles" role="img" aria-label="Diagram: a left and a right insole, each with sensors at the heel, arch, and forefoot, compared side to side.">
-      <svg viewBox="-20 -10 300 280" role="presentation" aria-hidden="true">
+    <figure className="soles" role="img" aria-label="Diagram: a left and a right insole, medial edges facing, each with one pressure sensor under the arch, compared side to side.">
+      <svg viewBox="0 0 260 276" role="presentation" aria-hidden="true">
         <defs>
           <linearGradient id="sole-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#5bd2ff" stopOpacity="0.16" />
-            <stop offset="1" stopColor="#ff6a13" stopOpacity="0.1" />
+            <stop offset="0" stopColor="#5bd2ff" stopOpacity="0.22" />
+            <stop offset="0.55" stopColor="#5bd2ff" stopOpacity="0.06" />
+            <stop offset="1" stopColor="#ff6a13" stopOpacity="0.2" />
           </linearGradient>
         </defs>
-        {ZONES.map(({ name, y, edge }, i) => (
-          <line
-            key={name}
-            className="soles__link"
-            x1={edge + 8}
-            y1={y}
-            x2={260 - edge - 8}
-            y2={y}
-            style={{ animationDelay: `${i * 0.4}s` }}
-          />
-        ))}
-        {[false, true].map((mirrored) => (
-          <g key={String(mirrored)} transform={mirrored ? "translate(260 0) scale(-1 1)" : undefined}>
-            <path d={SOLE} className="soles__outline" fill="url(#sole-fill)" />
-            {ZONES.map(({ name, x, y }, i) => (
-              <g key={name} transform={`translate(${x} ${y})`}>
-                <circle className="soles__halo" r="11" style={{ animationDelay: `${i * 0.4 + (mirrored ? 0.2 : 0)}s` }} />
-                <circle className="soles__dot" r="4" />
-              </g>
-            ))}
+        {FEET.map(({ foot, x, label }) => {
+          const d = footPath(foot, { x, y: 12, height: H });
+          const cx = x + (FOOT_WIDTH * H) / FOOT_HEIGHT / 2;
+          return (
+            <g key={foot}>
+              <path d={d} className="soles__outline" fill="url(#sole-fill)" />
+              {CONTOURS.map((k) => (
+                <path
+                  key={k}
+                  d={d}
+                  className="soles__contour"
+                  style={{ transformOrigin: `${cx}px ${12 + H * 0.56}px`, transform: `scale(${k})` }}
+                />
+              ))}
+              <text x={cx} y={270} className="soles__label" textAnchor="middle">
+                {label}
+              </text>
+            </g>
+          );
+        })}
+        <line className="soles__link" x1={ax1 + 10} y1={ay} x2={ax2 - 10} y2={ay} />
+        <text x={(ax1 + ax2) / 2} y={ay - 9} className="soles__zone" textAnchor="middle">
+          Arch
+        </text>
+        {arches.map(([cx, cy], i) => (
+          <g key={i} transform={`translate(${cx} ${cy})`}>
+            <circle className="soles__halo" r="11" style={{ animationDelay: `${i * 0.3}s` }} />
+            <circle className="soles__dot" r="4" />
           </g>
-        ))}
-        <text x="50" y="276" className="soles__label" textAnchor="middle">
-          L
-        </text>
-        <text x="210" y="276" className="soles__label" textAnchor="middle">
-          R
-        </text>
-        {ZONES.map(({ name, y }) => (
-          <text key={name} x="130" y={y - 8} className="soles__zone" textAnchor="middle">
-            {name}
-          </text>
         ))}
       </svg>
     </figure>

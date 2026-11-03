@@ -267,18 +267,28 @@
 }
 
 .soles {
-  margin: 0;
+  display: grid;
+  flex: 1;
+  place-items: center;
+  margin: 0 0 24px;
 }
 
 .soles svg {
   width: 100%;
-  max-height: 420px;
+  max-height: 460px;
   overflow: visible;
 }
 
 .soles__outline {
   stroke: rgb(255 255 255 / 0.28);
   stroke-width: 1.2;
+}
+
+.soles__contour {
+  fill: none;
+  stroke: rgb(91 210 255 / 0.16);
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
 }
 
 .soles__dot {
@@ -415,7 +425,7 @@
 .control-bar {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   padding: 4px;
   border: 1px solid var(--hairline-strong);
   border-radius: 14px;
@@ -458,6 +468,15 @@
 .control-bar__segment[data-tone="hot"] .control-bar__thumb {
   background: var(--ember);
   box-shadow: 0 8px 24px -6px rgb(255 106 19 / 0.6);
+}
+
+.control-bar__segment[data-tone="off"] .control-bar__thumb {
+  background: #5d6f84;
+  box-shadow: 0 8px 24px -6px rgb(0 0 0 / 0.5);
+}
+
+.mode-demo__word[data-tone="off"] {
+  color: var(--text-faint);
 }
 
 .mode-demo__body {

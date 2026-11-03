@@ -1,32 +1,35 @@
 import "@fontsource/instrument-serif/400.css";
 import "@fontsource/instrument-serif/400-italic.css";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Clock, Play } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 import { FaInstagram, FaLinkedinIn, FaTiktok, FaYoutube } from "react-icons/fa6";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import FlowingMenu from "../../components/FlowingMenu.jsx";
 import ScrollVelocity from "../../components/ScrollVelocity.jsx";
-import { CHANNELS, MEDIA_SECTIONS, POSTS, SOURCES } from "../../data/media.js";
+import { ARTICLES, SOURCES } from "../../data/learn.js";
+import { CHANNELS, MEDIA_SECTIONS, POSTS, VIDEOS } from "../../data/media.js";
 import { SOCIALS } from "../../data/socials.js";
 import { useDocumentTitle } from "../../lib/useDocumentTitle.js";
 import { useReducedMotion } from "../../lib/useReducedMotion.js";
+import Inline from "./Inline.jsx";
 import "./media.css";
 
 const EASE = [0.22, 1, 0.36, 1];
 const ICONS = { youtube: FaYoutube, instagram: FaInstagram, tiktok: FaTiktok, linkedin: FaLinkedinIn };
-const TICKER = ["Thermyx Media ✦ Selected Sources ✦ Video ✦ Press ✦ Research ✦ Field notes ✦ "];
+const TICKER = ["Thermyx Media ✦ Pitches ✦ Learn ✦ Heat ✦ Cold ✦ Your feet ✦ Selected Sources ✦ Research ✦ "];
 const pad = (n) => String(n).padStart(2, "0");
 
-// Media as a press room: a masthead, a dateline, a ticker, and two sections. Thermyx Media is our
-// channels and our posts and press (React Bits' FlowingMenu rows: hover one and it floods with a
-// marquee); Selected Sources is a bibliography of what we read and cite. The section is in the
-// address (/media?section=sources).
+// Media as a press room: a masthead, a dateline, a ticker, and three sections. Thermyx Media is our
+// channels, our videos, and our posts and press (React Bits' FlowingMenu rows: hover one and it
+// floods with a marquee); Learn is the app's articles; Selected Sources is the bibliography they
+// cite. The section is in the address (/media?section=learn).
 export default function MediaPage() {
   useDocumentTitle("Media");
   const reducedMotion = useReducedMotion();
   const [params, setParams] = useSearchParams();
-  const section = params.get("section") === "sources" ? "sources" : "thermyx";
-  const counts = { thermyx: POSTS.length + CHANNELS.length, sources: SOURCES.length };
+  const section = MEDIA_SECTIONS.some(({ id }) => id === params.get("section")) ? params.get("section") : "thermyx";
+  const counts = { thermyx: CHANNELS.length + VIDEOS.length + POSTS.length, learn: ARTICLES.length, sources: SOURCES.length };
   const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
 
   return (
@@ -35,7 +38,7 @@ export default function MediaPage() {
         <p className="press__dateline mono">
           <span>Thermyx</span>
           <span>{today}</span>
-          <span>{counts.thermyx + counts.sources} entries</span>
+          <span>{counts.thermyx + counts.learn + counts.sources} entries</span>
         </p>
         <h1 className="press__title">
           <span className="visually-hidden">Media</span>
@@ -88,7 +91,9 @@ export default function MediaPage() {
           exit={{ opacity: 0, y: -12, transition: { duration: 0.18 } }}
           transition={{ duration: 0.5, ease: EASE }}
         >
-          {section === "thermyx" ? <ThermyxMedia /> : <SelectedSources />}
+          {section === "thermyx" && <ThermyxMedia />}
+          {section === "learn" && <LearnShelf />}
+          {section === "sources" && <SelectedSources />}
         </motion.div>
       </AnimatePresence>
     </div>
@@ -134,6 +139,8 @@ function ThermyxMedia() {
           );
         })}
       </ul>
+
+      <Videos />
 
       <div className="posts">
         <div className="posts__head">
@@ -181,6 +188,144 @@ function renderPost(post) {
   );
 }
 
+// ── Thermyx Media: videos ──
+
+const thumb = (id) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+const formatDate = (date) => new Date(`${date}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+// One video large, the rest beside it. The player loads only when asked (a thumbnail until then),
+// from YouTube's no-cookie domain.
+function Videos() {
+  const [current, setCurrent] = useState({ id: VIDEOS[0].id, playing: false });
+  const video = VIDEOS.find((v) => v.id === current.id);
+  const youtube = SOCIALS.find((s) => s.id === "youtube");
+
+  return (
+    <div className="videos">
+      <div className="posts__head">
+        <h2 className="posts__title">Pitches and submissions</h2>
+        <a className="posts__note videos__channel" href={youtube.href} target="_blank" rel="noreferrer noopener">
+          {youtube.handle}
+          <ArrowUpRight size={14} aria-hidden="true" />
+          <span className="visually-hidden"> on YouTube (opens in a new tab)</span>
+        </a>
+      </div>
+      <div className="videos__grid">
+        <figure className="video-stage">
+          <div className="video-stage__frame">
+            {current.playing ? (
+              <iframe
+                key={video.id}
+                src={`https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&rel=0`}
+                title={video.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            ) : (
+              <button type="button" className="video-stage__poster" onClick={() => setCurrent({ id: video.id, playing: true })}>
+                <img src={thumb(video.id)} alt="" loading="lazy" />
+                <span className="video-stage__play" aria-hidden="true">
+                  <Play size={26} fill="currentColor" />
+                </span>
+                <span className="visually-hidden">Play {video.title}</span>
+              </button>
+            )}
+          </div>
+          <figcaption className="video-stage__caption">
+            <span className="post-row__type" data-type="video">
+              {video.kind}
+            </span>
+            <span className="video-stage__title">{video.title}</span>
+            <span className="video-stage__meta mono">
+              {video.event} · <time dateTime={video.date}>{formatDate(video.date)}</time>
+            </span>
+          </figcaption>
+        </figure>
+        <ol className="video-list">
+          {VIDEOS.map((v, i) => (
+            <li key={v.id}>
+              <button
+                type="button"
+                className="video-list__item"
+                aria-pressed={v.id === current.id}
+                onClick={() => setCurrent({ id: v.id, playing: v.id === current.id ? current.playing : false })}
+              >
+                <span className="video-list__thumb">
+                  <img src={thumb(v.id)} alt="" loading="lazy" />
+                </span>
+                <span className="video-list__text">
+                  <span className="video-list__index mono">{pad(i + 1)}</span>
+                  <span className="video-list__title">{v.title}</span>
+                  <span className="video-list__meta mono">{v.event}</span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  );
+}
+
+// ── Learn: the app's articles ──
+
+function LearnShelf() {
+  const [lead, ...rest] = ARTICLES;
+  return (
+    <section className="press__section learn-shelf" aria-label="Learn">
+      <p className="learn-shelf__lede">
+        The eight articles from the Learn tab in the Thermyx app, word for word: written for anyone, each with its sources.
+        Educational, not a medical diagnosis tool.
+      </p>
+      <Link to={`/media/learn/${lead.id}`} className="learn-lead" data-learn-tone={lead.section.tone}>
+        <span className="learn-lead__photo">
+          <img src={lead.photo.src} alt={lead.photo.alt} />
+        </span>
+        <span className="learn-lead__body">
+          <ArticleMeta article={lead} />
+          <span className="learn-lead__title">{lead.title}</span>
+          <span className="learn-lead__dek">{lead.dek}</span>
+          <span className="learn-card__read">
+            Read <ArrowRight size={16} aria-hidden="true" />
+          </span>
+        </span>
+      </Link>
+      <ul className="learn-grid">
+        {rest.map((article, i) => (
+          <motion.li
+            key={article.id}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "0px 0px -8% 0px" }}
+            transition={{ duration: 0.55, delay: (i % 3) * 0.06, ease: EASE }}
+          >
+            <Link to={`/media/learn/${article.id}`} className="learn-card" data-learn-tone={article.section.tone}>
+              <span className="learn-card__photo">
+                <img src={article.photo.src} alt={article.photo.alt} loading="lazy" />
+              </span>
+              <ArticleMeta article={article} />
+              <span className="learn-card__title">{article.title}</span>
+              <span className="learn-card__dek">{article.dek}</span>
+            </Link>
+          </motion.li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+export function ArticleMeta({ article }) {
+  return (
+    <span className="article-meta">
+      <span className="article-meta__section">{article.section.label}</span>
+      <span className="article-meta__time mono">
+        <Clock size={12} aria-hidden="true" /> {article.minutes} min read
+      </span>
+    </span>
+  );
+}
+
 // ── Selected Sources: a bibliography ──
 
 function SelectedSources() {
@@ -194,8 +339,8 @@ function SelectedSources() {
           <em>Sources</em>
         </h2>
         <p className="sources__lede">
-          The research, guidance, and reading behind Thermyx, and the people we build with. The first five are what the
-          app's own Learning Center cites.
+          Every reference the app's Learn articles cite, in APA 7, each checked against Crossref, PubMed, or the publisher
+          before it was listed.
         </p>
         <ul className="sources__legend">
           {types.map((type) => (
@@ -219,7 +364,10 @@ function SelectedSources() {
           >
             <span className="source__index mono">[{pad(i + 1)}]</span>
             <div className="source__body">
-              <p className="source__type">{source.type}</p>
+              <p className="source__type">
+                {source.type}
+                {source.year && <span className="source__year mono"> · {source.year}</span>}
+              </p>
               <h3 className="source__title">
                 {source.href ? (
                   <a href={source.href} target="_blank" rel="noreferrer noopener">
@@ -231,13 +379,24 @@ function SelectedSources() {
                   source.title
                 )}
               </h3>
-              <p className="source__cite mono">{[source.authors, source.venue, source.year].filter(Boolean).join(" · ")}</p>
-              {source.citedIn && (
-                <p className="source__note">
-                  Cited in the app: <em>“{source.citedIn}”</em>
-                </p>
-              )}
-              {source.example && <span className="example-tag">Example</span>}
+              <p className="source__cite">
+                {source.authors}
+                {source.venue && (
+                  <>
+                    {" · "}
+                    <Inline text={source.venue} />
+                  </>
+                )}
+              </p>
+              <p className="source__note">
+                Cited in{" "}
+                {source.citedIn.map(({ id, title }, j) => (
+                  <span key={id}>
+                    {j > 0 && ", "}
+                    <Link to={`/media/learn/${id}`}>“{title}”</Link>
+                  </span>
+                ))}
+              </p>
             </div>
           </motion.li>
         ))}

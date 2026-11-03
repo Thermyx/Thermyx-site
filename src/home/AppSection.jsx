@@ -1,4 +1,4 @@
-import { ArrowUpRight, BellRing, CircleSlash, HeartPulse, Link2, MessageCircleQuestion, ShieldCheck, Timer, Trash2, Users } from "lucide-react";
+import { ArrowUpRight, BellRing, CircleSlash, HandHelping, HeartPulse, LayoutGrid, Link2, MessageCircleQuestion, Newspaper, ShieldCheck, Thermometer, Trash2, Users } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -8,12 +8,14 @@ import SpotlightCard from "../components/SpotlightCard.jsx";
 import { useReducedMotion } from "../lib/useReducedMotion.js";
 import SectionHead from "../ui/SectionHead.jsx";
 
-// Sources: the app README (navigation, safety behaviour, relay access model, Apple Health) and
-// the firmware (Auto target 26 to 38 °C; fan only while cooling; 40 °C burn limit).
+// Sources: the app README (navigation, safety behaviour, relay access model, Apple Health, widgets,
+// Learn), ThermalControlBar.swift (one button: Auto → Cool → Heat → Off), and the firmware (Auto
+// target 26 to 38 °C; fan only while cooling; 40 °C burn limit).
 const MODES = [
+  { name: "Auto", tone: "auto", body: "Holds the target you set beside the button, anywhere from 26 to 38 °C." },
   { name: "Cool", tone: "cool", body: "The Peltier pulls heat away from your foot, and the fan and heat sink in the power pack carry it off." },
-  { name: "Auto", tone: "auto", body: "Holds the target you set, anywhere from 26 to 38 °C." },
   { name: "Heat", tone: "hot", body: "Warms your foot, and stops at 40 °C foot contact whatever you ask for." },
+  { name: "Off", tone: "off", body: "The Peltier and fan stop. The insoles keep sensing and reporting." },
 ];
 
 const FEATURES = [
@@ -28,8 +30,16 @@ const FEATURES = [
     title: "A personal baseline",
     body: "Calibrates over 10 calm minutes, then learns slowly. It can add Caution, but never lowers a level the fixed rules set.",
   },
-  { icon: Link2, title: "Stays connected", body: "Keeps both Bluetooth links with the screen locked, and reconnects a dropped insole on its own." },
-  { icon: Timer, title: "Nothing frozen on screen", body: "An insole that stops sending for 5 seconds has its readings cleared." },
+  {
+    icon: Link2,
+    title: "Stays connected, never frozen",
+    body: "Keeps both Bluetooth links with the screen locked, and clears an insole that stops sending for 5 seconds.",
+  },
+  {
+    icon: Newspaper,
+    title: "Learn",
+    body: "Eight short reads on heat, cold, and your feet, each with its sources. The app suggests the one that fits right now.",
+  },
   {
     icon: Users,
     title: "Trusted members",
@@ -46,6 +56,21 @@ const FEATURES = [
     body: "Off by default. Reads steps, walking steadiness, and workouts, and never writes body temperature.",
   },
   { icon: Trash2, title: "Delete my data", body: "Removes everything on the phone, and your record on the relay." },
+  {
+    icon: Thermometer,
+    title: "Thermal Recovery Test",
+    body: "From Caution up: stop, cool down, then hold still for 3 minutes while Thermyx checks whether the warmer foot is cooling.",
+  },
+  {
+    icon: HandHelping,
+    title: "Ask my circle for help",
+    body: "Need water, can't walk well, come get me, or feeling unwell: help from the people you trust, without calling 911.",
+  },
+  {
+    icon: LayoutGrid,
+    title: "Widgets and Live Activity",
+    body: "Both soles on the Home Screen, Lock Screen, and Dynamic Island, with Auto, Cool, Heat, and Off one press away.",
+  },
 ];
 
 export default function AppSection() {
@@ -57,7 +82,7 @@ export default function AppSection() {
           label="The app"
           titleId="app-title"
           title="One app for both feet."
-          lede="Three tabs: Home, Insights, and Safety. A thermal control bar sits above them, so Cool, Auto, and Heat are always one tap away."
+          lede="Four tabs: Home, Insights, Learn, and Safety. The thermal control sits above them on every screen: one button steps through Auto, Cool, Heat, and Off."
         />
 
         <div className="app-grid">
@@ -86,7 +111,7 @@ export default function AppSection() {
   );
 }
 
-// The thermal control bar, cycling through its three modes with the headline word.
+// The thermal control's four settings, in the order one tap steps through them, with the headline word.
 function ModeDemo() {
   const reducedMotion = useReducedMotion();
   const [index, setIndex] = useState(0);
@@ -94,7 +119,7 @@ function ModeDemo() {
 
   return (
     <SpotlightCard className="tile mode-demo" spotlightColor="rgb(255 106 19 / 0.12)">
-      <p className="tile__kicker eyebrow">The thermal control bar</p>
+      <p className="tile__kicker eyebrow">The thermal control · tap to step, hold for the list</p>
       <p className="mode-demo__headline">
         Set it to{" "}
         <RotatingText
@@ -125,7 +150,7 @@ function ModeDemo() {
       <p className="mode-demo__body">
         <strong>{mode.name}.</strong> {mode.body}
       </p>
-      <p className="mode-demo__note">Watchers get no control bar: they can see and call, never actuate someone else's insole.</p>
+      <p className="mode-demo__note">Taps reach the insoles only once you stop tapping, so stepping past Heat never sends heat. Watchers get no control at all.</p>
     </SpotlightCard>
   );
 }

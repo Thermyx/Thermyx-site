@@ -24,13 +24,13 @@ export const TEAM = [
   { id: "three", name: "Rajveer Thukral", role: "Chief Innovation Officer", photo: "/team/RAJVEER.png", 
     bio: [ "I contributed to the project by focusing on the hardware and physical design of the system. I helped plan how the components would fit together and worked on making the design practical and functional. My role connected the technical hardware with the overall structure of the final prototype." ],
     focus: ["Patent Operations", "Scientific Research", "Product Design"], 
-    background: [["Education", "Westside High School"], ["Academic Interests", "Engineering, Physics, Quantitative Research"], ["Fun fact", "placeholder"]],
+    background: [["Education", "Westside High School"], ["Academic Interests", "Engineering, Physics, Quantitative Research"], ["Fun fact", "I'm a big fan of sci-fi movies and books."]],
     links: [{label: "Email", href: "rajveersthukral@gmail.com"}, { label: "LinkedIn", href: "https://www.linkedin.com/in/rajveer-thukral-69b71a323/" }, {label: "Instagram", href: "https://www.instagram.com/rajveersthukral/"}], example: false 
   },
   { id: "four", name: "Reyansh Maheshwari", role: "Chief Product Officer", photo: "/team/REYANSH.png", 
     bio: [ "Reyansh is a Houston-based entrepreneur and the CPO of Thermyx. He leads the product's engineering, from the CAD design of the full insole assembly to the electronics and firmware that stream live sensor data to the app, along with the backend that ties it all together. He is interested in computer science and mathematics, and in building technology that keeps people safe in extreme heat." ],
     focus: ["Hardware Development", "Computer-Aided Design", "Mathematics"], 
-    background: [["Education", "Cypress Ridge High School"], ["Academic Interests", "Mathematics, Computer Science, Quantitative Research"], ["Fun fact", "placeholder"]],
+    background: [["Education", "Cypress Ridge High School"], ["Academic Interests", "Mathematics, Computer Science, Quantitative Research"], ["Fun fact", "I've played the drums for four years!"]],
     links: [{ label: "Email", href: "mailto:reyanshmah@gmail.com" }, { label: "LinkedIn", href: "https://www.linkedin.com/in/reyanshmaheshwari/" }, {label: "Instagram", href: "https://www.instagram.com/reyansh.maheshwari31/"}, {label: "GitHub", href: "https://github.com/reyanshmah"}], example: false 
   },
   { id: "five", name: "Siddhanth Relan", role: "Chief Financial Officer", photo: "/team/SIDDHANTH.png", 

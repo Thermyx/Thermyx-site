@@ -1,4 +1,4 @@
-import { ChartSpline, House, ShieldCheck, Users } from "lucide-react";
+import { ChartSpline, House, Newspaper, ShieldCheck, Users } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
@@ -11,20 +11,22 @@ import { HERO_FACTS, TOUR } from "./appContent.js";
 import AppStoreBadge from "./AppStoreBadge.jsx";
 import PhoneCanvas from "./phone/PhoneCanvas.jsx";
 
-const TAB_ICONS = { home: House, insights: ChartSpline, safety: ShieldCheck, watch: Users };
+const TAB_ICONS = { home: House, insights: ChartSpline, learn: Newspaper, safety: ShieldCheck, watch: Users };
 const STOPS = [{ id: "welcome", label: "Welcome" }, ...TOUR.map(({ id, tab }) => ({ id, label: tab }))];
 const SCREEN_LABEL = {
   welcome: "the welcome screen",
   home: "the Home tab",
   insights: "the Insights tab",
+  learn: "the Learn tab",
   safety: "the Safety tab",
   watch: "a watcher's Watch tab",
 };
 // Short facts that float beside the phone for each screen (wide screens).
 const CHIPS = {
-  welcome: [["iOS 17 or later", "cool"], ["Demo Mode built in", "hot"]],
+  welcome: [["iOS 17 or later", "cool"], ["Continue with Google", "hot"]],
   home: [["One Bluetooth link per foot", "cool"], ["Never averaged into one line", "hot"]],
   insights: [["7 days by the minute", "cool"], ["180 days by the hour", "hot"]],
+  learn: [["8 sourced articles", "cool"], ["Picked for right now", "hot"]],
   safety: [["Heat locks out from High risk", "hot"], ["Every alert explains itself", "cool"]],
   watch: [["A heartbeat every minute", "cool"], ["Can call · can't control", "hot"]],
 };

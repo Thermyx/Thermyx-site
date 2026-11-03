@@ -1,7 +1,7 @@
 // Component manifest: one entry per explorable part (CLAUDE.md §6). The owner reviews this copy.
 //   match: prefix of the GLTFLoader-sanitized body name (matched longest-first)
-//   role:  what the part does in Thermyx, written from the firmware (firmware/README.md,
-//          thermyx_insole.ino) and the app README; no invented specs or numbers
+//   role:  what the part does in Thermyx, following the app's own part descriptions
+//          (ThermyxApp/Views/Onboarding/InsoleStack.swift) and the firmware; no invented specs
 //   part:  part number / key spec, only where the CAD body name and firmware agree
 export const COMPONENTS = [
   // ── Insole ──
@@ -9,29 +9,29 @@ export const COMPONENTS = [
     match: "Comfort_Top_Layer",
     product: "insole",
     label: "Comfort top layer",
-    role: "The surface your foot rests on, laid over the three pressure sensors.",
+    role: "The soft layer your foot rests on, laid over the sensors.",
     part: "3 mm",
   },
   {
     match: "Pressure_Sensor_-_Heel",
     product: "insole",
     label: "Heel pressure sensor",
-    role: "A force-sensing resistor under the heel. With the arch and forefoot sensors, it tracks how your weight moves through each step.",
-    part: "FSR 402",
+    role: "A spare spot for a pressure sensor under the heel. Thermyx doesn't read it yet: the arch sensor is the one in use.",
+    part: null,
   },
   {
     match: "Pressure_Sensor_-_Arch",
     product: "insole",
     label: "Arch pressure sensor",
-    role: "A force-sensing resistor under the arch, one of the three zones the insole reads load from.",
+    role: "A force-sensing resistor that feels how hard you press down under your arch. Comparing your two feet shows when you lean on one side or limp.",
     part: "FSR 402",
   },
   {
     match: "Pressure_Sensor_-_Forefoot",
     product: "insole",
     label: "Forefoot pressure sensor",
-    role: "A force-sensing resistor under the forefoot. Its share of the load is the pressure balance the app reports.",
-    part: "FSR 402",
+    role: "A spare spot for a pressure sensor under the ball of the foot. Thermyx doesn't read it yet.",
+    part: null,
   },
   {
     match: "Peltier_Module",
@@ -51,7 +51,7 @@ export const COMPONENTS = [
     match: "Temperature_Sensor_-_Peltier_Hot_Side",
     product: "insole",
     label: "Second temperature sensor",
-    role: "A second temperature sensor, mounted beside the Peltier module.",
+    role: "Keeps an eye on the Peltier module so it can't run too hot.",
     part: null,
   },
   {
@@ -65,7 +65,7 @@ export const COMPONENTS = [
     match: "IMU_",
     product: "insole",
     label: "Motion sensor",
-    role: "Detects steps from acceleration, giving the app your cadence, time spent standing, and how steady your gait is.",
+    role: "Feels each step, so the app knows when you're walking or standing still, how fast you walk, and how steady your steps are.",
     part: "GY-521 · MPU-6050",
   },
   {
@@ -108,7 +108,7 @@ export const COMPONENTS = [
     match: "Battery_",
     product: "pack",
     label: "Battery",
-    role: "The power bank that runs the insole, the Peltier, and the fan, in its own removable bay.",
+    role: "Powers the insole, the Peltier, and the fan. It lifts out of its bay to charge.",
     part: "INIU P55 · 10,000 mAh",
   },
   {

@@ -23,8 +23,8 @@ export const SOCIALS = [
   {
     id: "youtube",
     name: "YouTube",
-    handle: "@Thermyx.business",
-    href: "https://www.youtube.com/channel/UCPdu5kEXVWh3vCo8BFEqRXQ",
+    handle: "@Thermyxsmartinsole",
+    href: "https://www.youtube.com/@Thermyxsmartinsole",
     color: "#ff1f3d",
   },
   {

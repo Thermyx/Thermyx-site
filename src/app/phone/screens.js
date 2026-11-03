@@ -3,6 +3,9 @@
 // bars wherever a live value would go. No numbers: the app never shows a reading it didn't
 // measure, and neither do these. Skeleton bars use one exact color, SKELETON, which the screen
 // shader detects to run its shimmer over them only.
+import { ARCH_SITE, footPath, footPoint } from "../../data/foot.js";
+import learnArticles from "../../data/learn/learning-articles.json";
+
 export const SCREEN_SIZE = { width: 600, height: 1300 }; // the phone screen's aspect (PHONE.screen)
 
 const INK = {
@@ -24,15 +27,22 @@ export const SKELETON = "#16304c";
 
 const FONT = '"Archivo Variable", "Archivo", system-ui, sans-serif';
 
-// The sole outline from the home page's pair diagram (left foot, 100 × 260 units).
-const SOLE =
-  "M50 256C31 256 22 241 22 216C22 188 18 160 14 128C10 98 7 74 10 52C14 24 34 4 60 4C82 4 95 22 94 48C93 74 84 96 78 118C72 140 71 162 75 186C79 210 75 256 50 256Z";
+const USER_TABS = [
+  ["Home", house],
+  ["Insights", chart],
+  ["Learn", newspaper],
+  ["Safety", shield],
+];
+
+// The app's Learn articles, in its order (Resources/Content/learning-articles.json).
+const ARTICLE_TITLES = learnArticles.articles.map((a) => a.title);
 
 // The screens, in the order the page tours them. Each draws into a 600 × 1300 canvas.
 export const SCREENS = {
   welcome: drawWelcome,
   home: drawHome,
   insights: drawInsights,
+  learn: drawLearn,
   safety: drawSafety,
   watch: drawWatch,
 };
@@ -68,23 +78,33 @@ function drawWelcome(ctx) {
   ctx.fillStyle = fade;
   ctx.fillRect(0, 0, 600, 1300);
 
-  text(ctx, "THERMYX", 300, 176, { size: 24, weight: 700, color: INK.text, align: "center", spacing: 7 });
-  text(ctx, "Climate control", 48, 742, { size: 62, weight: 800, color: INK.text, spacing: -1 });
-  text(ctx, "for every step", 48, 812, { size: 62, weight: 800, color: INK.text, spacing: -1 });
+  // The insole, standing in for the welcome screen's 3D model (Views/Onboarding/OnboardingWelcome.swift).
+  ctx.save();
+  ctx.translate(300, 420);
+  ctx.rotate(-0.32);
+  const insole = new Path2D(footPath("left", { x: -95, y: -226, height: 452 }));
+  const fill = ctx.createLinearGradient(0, -226, 0, 226);
+  fill.addColorStop(0, "rgba(91,210,255,0.34)");
+  fill.addColorStop(1, "rgba(255,106,19,0.26)");
+  ctx.fillStyle = fill;
+  ctx.fill(insole);
+  ctx.strokeStyle = "rgba(234,242,250,0.5)";
+  ctx.lineWidth = 2.4;
+  ctx.stroke(insole);
+  ctx.restore();
+  text(ctx, "Drag to turn · tap a part", 300, 708, { size: 19, weight: 600, color: INK.faint, align: "center" });
+
+  text(ctx, "Thermyx", 48, 832, { size: 66, weight: 800, color: INK.text, spacing: -1 });
   paragraph(
     ctx,
-    "A smart insole that senses your foot temperature, pressure, and movement — then heats or cools in real time.",
+    "Smart insoles that heat and cool your feet, and keep track of temperature, pressure and steps under both of them as you go.",
     48,
-    880,
-    500,
+    890,
+    504,
     { size: 25, color: INK.muted, lineHeight: 37 },
   );
-  // Page dots and the primary button (its label left as a skeleton).
-  pill(ctx, 48, 1112, 34, 9, INK.ice);
-  pill(ctx, 92, 1112, 9, 9, "rgba(234,242,250,0.3)");
-  pill(ctx, 111, 1112, 9, 9, "rgba(234,242,250,0.3)");
-  pill(ctx, 48, 1160, 504, 76, INK.signal);
-  pill(ctx, 230, 1191, 140, 14, "rgba(3,18,31,0.35)");
+  pill(ctx, 48, 1110, 504, 80, "#ffffff");
+  text(ctx, "Continue with Google", 300, 1159, { size: 25, weight: 700, color: "#1a1a1a", align: "center" });
 }
 
 function drawHome(ctx) {
@@ -94,16 +114,16 @@ function drawHome(ctx) {
   circle(ctx, 76, 244, 14, SKELETON);
   bar(ctx, 104, 226, 150, 16);
   bar(ctx, 104, 252, 250, 13);
-  // The pair: two soles, medial edges facing, each with its three zones.
+  // The pair: two soles, medial edges facing, the one arch sensor marked on each.
   card(ctx, 30, 308, 540, 404);
-  sole(ctx, 92, 334, 1.36, false);
-  sole(ctx, 508, 334, 1.36, true);
-  text(ctx, "L", 160, 690, { size: 20, weight: 600, color: INK.faint, align: "center" });
-  text(ctx, "R", 440, 690, { size: 20, weight: 600, color: INK.faint, align: "center" });
-  // Zone readouts (HomeView labels).
-  tiles(ctx, 728, ["Ambient", "Forefoot load", "L–R gap", "Steadiness"]);
-  controlBar(ctx, 1004, 1);
-  tabBar(ctx, ["Home", "Insights", "Safety"], 0, [house, chart, shield]);
+  sole(ctx, "left", 300 - 26 - 128, 336, 320);
+  sole(ctx, "right", 300 + 26, 336, 320);
+  text(ctx, "L", 210, 690, { size: 20, weight: 600, color: INK.faint, align: "center" });
+  text(ctx, "R", 390, 690, { size: 20, weight: 600, color: INK.faint, align: "center" });
+  // The metric tiles (HomeView labels).
+  tiles(ctx, 728, ["Air outside", "Steps today", "Weight", "Steps a minute"]);
+  controlBar(ctx, 1004, 0);
+  tabBar(ctx, USER_TABS, 0);
 }
 
 function drawInsights(ctx) {
@@ -117,10 +137,30 @@ function drawInsights(ctx) {
   bar(ctx, 190, 466, 220, 12);
   tiles(ctx, 618, ["Steps today", "Steadiness", "Foot", "Ambient"]);
   card(ctx, 30, 860, 540, 84);
-  text(ctx, "Learning center", 58, 912, { size: 26, weight: 600, color: INK.text });
+  text(ctx, "Daily summaries", 58, 912, { size: 26, weight: 600, color: INK.text });
   chevron(ctx, 536, 902);
-  controlBar(ctx, 1004, 1);
-  tabBar(ctx, ["Home", "Insights", "Safety"], 1, [house, chart, shield]);
+  controlBar(ctx, 1004, 0);
+  tabBar(ctx, USER_TABS, 1);
+}
+
+function drawLearn(ctx) {
+  header(ctx, "Learn");
+  text(ctx, "Short, sourced reads on heat, cold and your feet.", 34, 196, { size: 21, weight: 500, color: INK.muted });
+  // "For right now": the suggested article, its photo left as a skeleton.
+  text(ctx, "FOR RIGHT NOW", 34, 256, { size: 18, weight: 700, color: INK.faint, spacing: 3 });
+  card(ctx, 30, 274, 540, 330);
+  ctx.fillStyle = SKELETON;
+  roundRect(ctx, 46, 290, 508, 190, 16, true);
+  paragraph(ctx, ARTICLE_TITLES[0], 58, 524, 480, { size: 25, color: INK.text, lineHeight: 32 });
+  ARTICLE_TITLES.slice(1, 5).forEach((title, i) => {
+    const y = 624 + i * 92;
+    card(ctx, 30, y, 540, 80);
+    ctx.fillStyle = SKELETON;
+    roundRect(ctx, 44, y + 12, 56, 56, 12, true);
+    paragraph(ctx, title, 118, y + 34, 400, { size: 20, color: INK.text, lineHeight: 26 });
+  });
+  controlBar(ctx, 1004, 0);
+  tabBar(ctx, USER_TABS, 2);
 }
 
 function drawSafety(ctx) {
@@ -155,8 +195,8 @@ function drawSafety(ctx) {
   card(ctx, 30, 906, 540, 80);
   text(ctx, "Advanced", 58, 955, { size: 25, weight: 600, color: INK.text });
   chevron(ctx, 536, 946);
-  controlBar(ctx, 1004, 1);
-  tabBar(ctx, ["Home", "Insights", "Safety"], 2, [house, chart, shield]);
+  controlBar(ctx, 1004, 0);
+  tabBar(ctx, USER_TABS, 3);
 }
 
 function drawWatch(ctx) {
@@ -169,13 +209,21 @@ function drawWatch(ctx) {
   bar(ctx, 58, 318, 300, 15);
   text(ctx, "Updated", 58, 360, { size: 19, weight: 600, color: INK.faint });
   bar(ctx, 146, 346, 70, 15);
-  tiles(ctx, 398, ["Foot temperature", "Ambient", "L–R gap", "Movement"]);
+  tiles(ctx, 398, ["Foot temperature", "Air outside", "L–R gap", "Movement"]);
   card(ctx, 30, 642, 540, 104);
   text(ctx, "Insole battery", 58, 684, { size: 21, weight: 600, color: INK.muted });
   bar(ctx, 58, 702, 120, 22);
   pill(ctx, 30, 772, 540, 78, INK.signal);
   phoneGlyph(ctx, 300, 811);
-  tabBar(ctx, ["Watch", "Insights", "Settings"], 0, [people, chart, gear]);
+  tabBar(
+    ctx,
+    [
+      ["Watch", people],
+      ["Insights", chart],
+      ["Settings", gear],
+    ],
+    0,
+  );
 }
 
 // ── Pieces ──────────────────────────────────────────────────────────────────
@@ -221,21 +269,25 @@ function tiles(ctx, y, labels) {
   });
 }
 
-function controlBar(ctx, y, selected) {
+// The thermal control (DesignSystem/Components/ThermalControlBar.swift): one button that steps
+// Auto → Cool → Heat → Off, and the Auto target's stepper beside it (its value a skeleton).
+const MODE_COLORS = [INK.text, INK.ice, INK.ember, INK.faint];
+
+function controlBar(ctx, y, mode) {
   ctx.fillStyle = INK.bar;
   roundRect(ctx, 30, y, 540, 76, 22, true);
   ctx.strokeStyle = INK.hairline;
   ctx.lineWidth = 1.5;
   roundRect(ctx, 30, y, 540, 76, 22, false);
-  ["Cool", "Auto", "Heat"].forEach((label, i) => {
-    const x = 36 + i * 176;
-    if (i === selected) {
-      ctx.fillStyle = INK.selected;
-      roundRect(ctx, x, y + 6, 176, 64, 18, true);
-    }
-    const color = i === selected ? INK.text : INK.muted;
-    text(ctx, label, x + 88, y + 47, { size: 24, weight: 700, color, align: "center" });
-  });
+  ctx.fillStyle = INK.selected;
+  roundRect(ctx, 38, y + 8, 328, 60, 18, true);
+  circle(ctx, 68, y + 38, 7, MODE_COLORS[mode]);
+  text(ctx, ["Auto", "Cool", "Heat", "Off"][mode], 88, y + 47, { size: 24, weight: 700, color: INK.text });
+  ctx.fillStyle = INK.deck;
+  roundRect(ctx, 376, y + 8, 186, 60, 18, true);
+  text(ctx, "−", 404, y + 48, { size: 30, weight: 600, color: INK.muted, align: "center" });
+  text(ctx, "+", 534, y + 48, { size: 30, weight: 600, color: INK.muted, align: "center" });
+  bar(ctx, 438, y + 28, 62, 20);
 }
 
 function segmented(ctx, x, y, width, labels, selected) {
@@ -251,42 +303,33 @@ function segmented(ctx, x, y, width, labels, selected) {
   });
 }
 
-function tabBar(ctx, labels, active, icons) {
+// `tabs` is a list of [label, icon]; they share the bar's width evenly.
+function tabBar(ctx, tabs, active) {
   ctx.fillStyle = INK.bar;
   ctx.fillRect(0, 1112, 600, 188);
   ctx.fillStyle = INK.hairline;
   ctx.fillRect(0, 1112, 600, 1.5);
-  labels.forEach((label, i) => {
-    const cx = 100 + i * 200;
+  const step = 600 / tabs.length;
+  tabs.forEach(([label, icon], i) => {
+    const cx = step * (i + 0.5);
     const color = i === active ? INK.ice : INK.faint;
-    icons[i](ctx, cx, 1160, color);
+    icon(ctx, cx, 1160, color);
     text(ctx, label, cx, 1214, { size: 19, weight: 600, color, align: "center" });
   });
 }
 
-function sole(ctx, x, y, scale, mirrored) {
-  ctx.save();
-  ctx.translate(x, y);
-  if (mirrored) ctx.scale(-scale, scale);
-  else ctx.scale(scale, scale);
-  const path = new Path2D(SOLE);
+// One foot, the app's own outline, `height` tall with its box's top-left at (x, y), and the arch
+// sensor's site as a skeleton until a reading exists.
+function sole(ctx, foot, x, y, height) {
+  const at = { x, y, height };
+  const path = new Path2D(footPath(foot, at));
   ctx.fillStyle = "#11243a";
   ctx.fill(path);
   ctx.strokeStyle = "rgba(159,182,206,0.45)";
-  ctx.lineWidth = 1.6 / scale;
+  ctx.lineWidth = 1.6;
   ctx.stroke(path);
-  // Heel, arch, forefoot zones: skeletons until a reading exists.
-  for (const [zx, zy, r] of [
-    [60, 64, 17],
-    [37, 148, 14],
-    [49, 218, 17],
-  ]) {
-    ctx.beginPath();
-    ctx.arc(zx, zy, r, 0, Math.PI * 2);
-    ctx.fillStyle = SKELETON;
-    ctx.fill();
-  }
-  ctx.restore();
+  const [ax, ay] = footPoint(foot, ARCH_SITE, at);
+  circle(ctx, ax, ay, 16, SKELETON);
 }
 
 function card(ctx, x, y, w, h) {
@@ -397,6 +440,19 @@ function house(ctx, x, y, color) {
   ctx.lineTo(x - 12, y + 15);
   ctx.lineTo(x + 12, y + 15);
   ctx.lineTo(x + 12, y - 5);
+  ctx.stroke();
+}
+
+function newspaper(ctx, x, y, color) {
+  stroke(ctx, color);
+  ctx.beginPath();
+  ctx.roundRect(x - 15, y - 15, 30, 30, 5);
+  ctx.moveTo(x - 8, y - 6);
+  ctx.lineTo(x + 8, y - 6);
+  ctx.moveTo(x - 8, y + 1);
+  ctx.lineTo(x + 8, y + 1);
+  ctx.moveTo(x - 8, y + 8);
+  ctx.lineTo(x + 3, y + 8);
   ctx.stroke();
 }
 

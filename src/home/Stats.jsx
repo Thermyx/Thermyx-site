@@ -1,11 +1,11 @@
 import CountUp from "../components/CountUp.jsx";
 import { COMPONENTS } from "../data/components.js";
 
-// Counts that are facts: the firmware (sensors), the CAD (parts, battery), and the app README
+// Counts that are facts: the firmware (burn limit), the CAD (parts, battery), and the app README
 // (one Bluetooth link per insole; hour buckets kept 180 days).
 const STATS = [
   { value: 2, label: "insoles, each with its own Bluetooth link to the app" },
-  { value: 3, label: "force sensors under each foot: heel, arch, and forefoot" },
+  { value: 40, unit: "°C", label: "foot contact, where the insole stops heating on its own" },
   { value: COMPONENTS.length, label: "parts across the insole and its power pack" },
   { value: 10000, unit: "mAh", label: "power bank in a removable bay, outside the shoe" },
   { value: 180, unit: "days", label: "of hour-by-hour history, kept on your phone" },

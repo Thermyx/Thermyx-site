@@ -1,20 +1,14 @@
-// The chapters that play beside the model as it turns and comes apart. Facts only, from the
-// firmware (firmware/README.md, thermyx_insole.ino) and the app README. `highlight` lists the
+// The chapters that play beside the model as it turns and comes apart. Facts only, from the app
+// README, its part descriptions (InsoleStack.swift), and the firmware (firmware/README.md). `highlight` lists the
 // manifest ids that light up in 3D while the chapter is on screen.
 export const CHAPTERS = [
   {
     id: "sense",
     label: "Sense",
     title: "It feels every step.",
-    body: "Three force sensors under the heel, arch, and forefoot track how your weight moves. A contact sensor reads foot temperature, and a motion sensor reads each step.",
-    chips: ["3 × FSR 402", "Contact temperature", "MPU-6050"],
-    highlight: [
-      "Pressure_Sensor_-_Heel",
-      "Pressure_Sensor_-_Arch",
-      "Pressure_Sensor_-_Forefoot",
-      "Temperature_Sensor_-_Foot_Contact",
-      "IMU_",
-    ],
+    body: "A force sensor under the arch feels how hard you press down. A contact sensor reads foot temperature, and a motion sensor counts each step and how steady it is.",
+    chips: ["Arch FSR 402", "Contact temperature", "MPU-6050"],
+    highlight: ["Pressure_Sensor_-_Arch", "Temperature_Sensor_-_Foot_Contact", "IMU_"],
   },
   {
     id: "decide",
@@ -29,14 +23,14 @@ export const CHAPTERS = [
     label: "Heat or cool",
     title: "Moves heat both ways.",
     body: "A Peltier module under the heel heats or cools, driven in either direction by a DRV8833 H-bridge. When it cools, a fan and heat sink in the power pack carry the heat away.",
-    chips: ["TEC1-04901", "DRV8833", "Cool · Auto · Heat"],
+    chips: ["TEC1-04901", "DRV8833", "Auto · Cool · Heat · Off"],
     highlight: ["Peltier_Module", "Peltier_Driver_", "Heat_Sink_", "Cooling_Fan_"],
   },
   {
     id: "power",
     label: "Power",
     title: "Power rides outside the shoe.",
-    body: "A 10,000 mAh power bank sits in the external pack, in its own removable bay, alongside the heat sink and fan.",
+    body: "A 10,000 mAh power bank sits in the external pack, alongside the heat sink and fan. It lifts out of its bay to charge.",
     chips: ["INIU P55", "10,000 mAh", "Removable bay"],
     highlight: ["Battery_", "Battery_Bay_Lid", "External_Compartment_Shell"],
   },
